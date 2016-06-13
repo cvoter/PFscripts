@@ -1,0 +1,26 @@
+# swapPFB.sub
+# 2016.01 Carolyn Voter
+#------------------------
+# ***Run-specific arguments***
+# "runname" and "flux" must come from DAG
+#------------------------
+# For all jobs
+#------------------------
+universe = vanilla
+executable = /home/cvoter/PFall/scripts/swapPFB.sh
+arguments = $(runname)
+output = $(runname).swapPFB.out
+error = $(runname).swapPFB.err
+log = $(runname).swapPFB.log
+
+request_cpus = 1
+request_memory = 100MB
+request_disk = 500MB
+requirements = ( HasGluster == true )
+
+initialdir = /home/cvoter/PFall/$(runname)
+transfer_input_files = $runname.runPF.log
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+
+queue

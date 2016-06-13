@@ -1,0 +1,89 @@
+# PFBcreate.sub
+# 2016.01 Carolyn Voter
+#------------------------
+# ***Run-specific arguments***
+# "runname" and "flux" must come from DAG
+#------------------------
+# For all jobs
+#------------------------
+universe = vanilla
+executable = /home/cvoter/PFall/scripts/PFBcreate.sh
+arguments = $(runname) $(t0) $(tf) $(flux)
+output = PFBcreate/$(runname).$(flux).$(time).out
+error = PFBcreate/$(runname).$(flux).$(time).err
+log = PFBcreate/$(runname).$(flux).$(time).log
+
+request_cpus = 1
+request_memory = 250MB
+request_disk = 5GB
+requirements = ( HasGluster == true )
+
+initialdir = /home/cvoter/PFall/$(runname)
+transfer_input_files = /home/cvoter/PFall/scripts/$(flux).tcl
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+
+time = A
+t0 = 0
+tf = 12
+queue
+
+#time = A
+#t0 = 0
+#tf = 430
+#queue
+
+#time = B
+#t0 = 430
+#tf = 860
+#queue
+
+#time = C
+#t0 = 860
+#tf = 1290
+#queue
+
+#time = D
+#t0 = 1290
+#tf = 1720
+#queue
+
+#time = E
+#t0 = 1720
+#tf = 2150
+#queue
+
+#time = F
+#t0 = 2150
+#tf = 2580
+#queue
+
+#time = G
+#t0 = 2580
+#tf = 3010
+#queue
+
+#time = H
+#t0 = 3010
+#tf = 3440
+#queue
+
+#time = I
+#t0 = 3440
+#tf = 3870
+#queue
+
+#time = J
+#t0 = 3870
+#tf = 4300
+#queue
+
+#time = K
+#t0 = 4300
+#tf = 4730
+#queue
+
+#time = L
+#t0 = 4730
+#tf = 5160
+#queue

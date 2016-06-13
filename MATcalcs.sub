@@ -1,0 +1,24 @@
+# MATcalcs.sub
+# 2016.01 Carolyn Voter
+#------------------------
+# ***Run-specific arguments***
+# arguments = <Matlab version> <runname> <flux>
+#------------------------
+arguments = v84 $(runname) $(flux)
+universe = vanilla
+executable = /home/cvoter/PFall/scripts/run_MATcalcs.sh
+output = MATcalcs/$(runname).$(flux).out
+error = MATcalcs/$(runname).$(flux).err
+log = MATcalcs/$(runname).$(flux).log
+
+request_cpus = 1
+request_memory = 4GB
+request_disk = 3GB
+requirements = ( HasGluster == true )
+
+initialdir = /home/cvoter/PFall/$(runname)
+transfer_input_files = /home/cvoter/PFall/scripts/MATcalcs
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+
+queue
