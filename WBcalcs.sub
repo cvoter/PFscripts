@@ -6,7 +6,7 @@
 #------------------------
 arguments = v84 $(runname)
 universe = vanilla
-executable = /home/cvoter/PFall/scripts/run_WBcalcs.sh
+executable = /home/cvoter/Parflow/models/scripts/run_WBcalcs.sh
 output = $(runname).WB.out
 error = $(runname).WB.err
 log = $(runname).WB.log
@@ -16,8 +16,8 @@ request_memory = 4GB
 request_disk = 3GB
 requirements = ( HasGluster == true )
 
-initialdir = /home/cvoter/PFall/$(runname)
-transfer_input_files = /home/cvoter/PFall/scripts/WBcalcs
+initialdir = /home/cvoter/Parflow/models/$(runname)
+transfer_input_files = /home/cvoter/Parflow/models/scripts/WBcalcs
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
 
