@@ -18,6 +18,8 @@ export PARFLOW_DIR=$BASE/parflow
 export SILO_PATH=$BASE/silo-4.9.1-bsd
 export HYPRE_PATH=$BASE/hypre-2.9.0b
 export TCL_PATH=$BASE/tcl-8.6.5
+export HDF5_PATH=$BASE/hdf5-1.8.17
+export LD_LIBRARY_PATH=$HDF5_PATH/lib:$LD_LIBRARY_PATH
 export MPI_PATH=/mnt/gluster/chtc/mpich-3.1
 export LD_LIBRARY_PATH=$MPI_PATH/lib:$LD_LIBRARY_PATH
 export PATH=$MPI_PATH/bin:$PATH
@@ -31,3 +33,4 @@ cd $GHOME
 # DO PARFLOW STUFF
 # -------------------------------------------
 tclsh preParflow.tcl
+rm -f preParflow1D.tcl
