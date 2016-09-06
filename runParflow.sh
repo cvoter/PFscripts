@@ -95,7 +95,7 @@ else
   export pfStartCount=$(echo $ICpressure | tail -c 10 | sed 's/.\{4\}$//' | sed 's/^0*//')
   export start=$((pfStartCount/drun+1))
   export prettyStart==$(printf "%05d" $pfStartCount)
-  cp gp.rst.$prettyStart.* $HOME/$runname/
+  cp gp.rst."$prettyStart".* $HOME/$runname/
 fi
 cp $ICpressure $HOME/$runname/
 cd $HOME/$runname
@@ -158,7 +158,11 @@ for ((loop=start;loop<=nruns;loop++)); do
   export startDelete=$pfStartCount
   export ICpressure=$(find . -name "$runname.out.press.*.pfb" | sort -n | tail -1 | sed -r 's/^.{2}//')
   export pfStartCount=$(echo $ICpressure | tail -c 10 | sed 's/.\{4\}$//' | sed 's/^0*//')
-  export prettyStart==$(printf "%05d" $pfStartCount)
+  export prettyStart=$(printf "%05d" $pfStartCount)
+  
+  # WHAT CLM RESTART FILES EXIST HERE?
+  pwd >> $runname.info.txt
+  ls >> $runname.info.txt 
 
   # DELETE DIST PFBS AND EXTRA CLM RESTARTS
   find . -name "*pfb.dist*" -delete
@@ -201,7 +205,7 @@ for ((loop=start;loop<=nruns;loop++)); do
   cp $runname.kinsol.log $GHOME/$runname.kinsol.log
   #Restart files second
   cp $ICpressure $GHOME/
-  cp gp.rst.$prettyStart.* $GHOME/
+  cp gp.rst."$prettyStart".* $GHOME/
   cd ..
   newdirname=$(printf "%s_%s" $runname $prettyloop)
   tar zcf $newdirname.tar.gz $runname
@@ -211,7 +215,7 @@ for ((loop=start;loop<=nruns;loop++)); do
 
   # REMOVE FILES THAT JUST TRANSFERED, RESET ICPRESSURE
   mkdir $HOME/savethese
-  mv drv_vegm.dat drv_vegp.dat nldas.1hr.clm.txt slopex.pfb slopey.pfb subsurfaceFeature.pfb runParflow.tcl $runname.info.txt $runname.kinsol.log gp.rst.$prettyStart.* $ICpressure $HOME/savethese/
+  mv drv_vegm.dat drv_vegp.dat nldas.1hr.clm.txt slopex.pfb slopey.pfb subsurfaceFeature.pfb runParflow.tcl $runname.info.txt $runname.kinsol.log gp.rst."$prettyStart".* $ICpressure $HOME/savethese/
   if [ -e drv_clmin_restart.dat ]; then
     mv drv_clmin_restart.dat $HOME/savethese/drv_clmin.dat
   else mv drv_clmin.dat $HOME/savethese/drv_clmin.dat
