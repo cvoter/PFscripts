@@ -4,11 +4,11 @@
 
 #------------------------
 # ***Run-specific arguments***
-# "runname","totalHr" must come from DAG
+# "runname","totalHr","drun" must come from DAG
 #------------------------
 universe = vanilla
 executable = /home/cvoter/Parflow/models/scripts/runParflow.sh
-arguments = $(runname) $(totalHr)
+arguments = $(runname) $(totalHr) $(drun)
 output = $(runname).runPF.out
 error = $(runname).runPF.err
 log = $(runname).runPF.log
