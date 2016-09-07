@@ -8,12 +8,12 @@
 #------------------------
 universe = vanilla
 executable = /home/cvoter/Parflow/models/scripts/runParflow.sh
-arguments = $(runname) $(totalHr) $(drun)
+arguments = $(runname) $(totalHr) $(drun) $(P) $(Q) $(np)
 output = $(runname).runPF.out
 error = $(runname).runPF.err
 log = $(runname).runPF.log
 
-request_cpus = 1
+request_cpus = $(np)
 request_memory = 4GB
 request_disk = 1GB
 requirements = ( HasGluster == true )
