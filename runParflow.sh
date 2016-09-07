@@ -6,7 +6,11 @@
 export runname=$1
 export totalHr=$2
 export drun=$3
+export P=$4
+export Q=$5
+export np=$6
 export nruns=$(((totalHr+drun-1)/drun))
+export R=1
 
 # -------------------------------------------
 # SET ENVIRONMENT VARIABLES
@@ -57,10 +61,10 @@ export xU=${10}
 export yU=${11}
 export zU=${12}
 
-export P=${13}
-export Q=${14}
-export R=${15}
-export np=$((P*Q*R))
+#export P=${13}
+#export Q=${14}
+#export R=1
+#export np=$((P*Q*R))
 
 export Ks_soil=${18}
 export mn_grass=${19}
@@ -159,10 +163,6 @@ for ((loop=start;loop<=nruns;loop++)); do
   export ICpressure=$(find . -name "$runname.out.press.*.pfb" | sort -n | tail -1 | sed -r 's/^.{2}//')
   export pfStartCount=$(echo $ICpressure | tail -c 10 | sed 's/.\{4\}$//' | sed 's/^0*//')
   export prettyStart=$(printf "%05d" $pfStartCount)
-  
-  # WHAT CLM RESTART FILES EXIST HERE?
-  pwd >> $runname.info.txt
-  ls >> $runname.info.txt 
 
   # DELETE DIST PFBS AND EXTRA CLM RESTARTS
   find . -name "*pfb.dist*" -delete
@@ -229,4 +229,11 @@ done
 # -------------------------------------------
 # UNTAR ALL BACK IN GHOME
 # -------------------------------------------
+cd $GHOME
+for ((loop=1;loop<=nruns;loop++)); do
+  prettyloop=$(printf "%02d" $loop)
+  dirname=$(printf "%s_%s" $runname $prettyloop)
+  tar xzf $dirname.tar.gz --strip-components=1
+  rm -f $dirname.tar.gz
+done
 exit 0
