@@ -114,7 +114,7 @@ printf "\n\n\n============================PF START LOOP: %d...PF START TIME: %d=
 printf "============================PF START LOOP: %d...PF START TIME: %d============================\n" $start $pfStartCount >> $runname.info.txt
 printf "%s\n" $runname >> $runname.info.txt
 date +"%H:%M:%S %Y-%m-%d" >> $runname.info.txt
-printf "\nPARAMETERS\nUnits: L[=]meters, T[=]seconds, M[=]kilograms\nDomain\n" >> $runname.info.txt
+printf "\nPARAMETERS\nUnits: L[=]meters, T[=]hours, M[=]kilograms\nDomain\n" >> $runname.info.txt
 printf "[xL,yL,zL] = [%.2f, %.2f, %.2f] meters\n" $xL $yL $zL >> $runname.info.txt
 printf "[nx,ny,nz] = [%.0f, %.0f, %.0f]\n" $nx $ny $nz >> $runname.info.txt
 printf "[dx,dy,dz] = [%.2f, %.2f, %.2f] meters\n" $dx $dy $dz >> $runname.info.txt
