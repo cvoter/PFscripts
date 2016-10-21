@@ -34,3 +34,10 @@ cd $GHOME
 # -------------------------------------------
 tclsh preParflow.tcl
 rm -f preParflow1D.tcl
+
+MATdir=/mnt/gluster/cvoter/MatlabOut/$runname
+if [ ! -e $MATdir ]; then
+  mkdir $MATdir
+fi
+cp $GHOME/domainInfo.mat $MATdir/
+cp $GHOME/precip.mat $MATdir/
