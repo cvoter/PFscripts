@@ -66,21 +66,21 @@ export zU=${12}
 #export R=1
 #export np=$((P*Q*R))
 
-export Ks_soil=${18}
-export mn_grass=${19}
-export VGa_soil=${20}
-export VGn_soil=${21}
-export porosity_soil=${22}
-export Ssat_soil=${23}
-export Sres_soil=${24}
+export Ks_soil=${16}
+export mn_grass=${17}
+export VGa_soil=${18}
+export VGn_soil=${19}
+export porosity_soil=${20}
+export Ssat_soil=${21}
+export Sres_soil=${22}
 
-export Ks_imperv=${25}
-export mn_imperv=${26}
-export VGa_imperv=${27}
-export VGn_imperv=${28}
-export porosity_imperv=${29}
-export Ssat_imperv=${30}
-export Sres_imperv=${31}
+export Ks_imperv=${23}
+export mn_imperv=${24}
+export VGa_imperv=${25}
+export VGn_imperv=${26}
+export porosity_imperv=${27}
+export Ssat_imperv=${28}
+export Sres_imperv=${29}
 
 # -------------------------------------------
 # CHECK APPROPRIATE ICs AND STARTING LOOP
