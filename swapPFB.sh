@@ -48,6 +48,7 @@ new=tr
 rename $old $new $GHOME/*.pfb
 
 #COPY DISK AND MEM INFO
+printf "========PF RESOURCE USAGE========\n" >> $GHOME/$runname.info.txt
 sed -n '/Disk (KB)/s/ \+/ /gp' $runname.runPF.log | cut -d $'\t' -f2 | cut -d ' ' -f2-5 >> $GHOME/$runname.info.txt
 sed -n '/Memory (MB)/s/ \+/ /gp' $runname.runPF.log | cut -d $'\t' -f2 | cut -d ' ' -f2-5 >> $GHOME/$runname.info.txt
 cp $GHOME/$runname.info.txt $MHOME
