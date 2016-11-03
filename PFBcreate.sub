@@ -15,7 +15,7 @@ log = PFBcreate/$(runname).$(flux).$(time).log
 
 request_cpus = 1
 request_memory = 250MB
-request_disk = 5GB
+request_disk = 1GB
 requirements = ( HasGluster == true )
 
 initialdir = /home/cvoter/Parflow/models/$(runname)
@@ -25,7 +25,7 @@ when_to_transfer_output = ON_EXIT
 
 time = A
 t0 = 0
-tf = 12
+tf = 24
 queue
 
 #time = A

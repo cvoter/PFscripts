@@ -14,7 +14,7 @@ error = $(runname).postPF.err
 log = $(runname).postPF.log
 
 request_cpus = 1
-request_memory = 4GB
+request_memory = 1GB
 request_disk = 1GB
 requirements = ( HasGluster == true )
 +is_resumable = true

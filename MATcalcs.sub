@@ -12,7 +12,7 @@ error = MATcalcs/$(runname).$(flux).err
 log = MATcalcs/$(runname).$(flux).log
 
 request_cpus = 1
-request_memory = 4GB
+request_memory = 1GB
 request_disk = 3GB
 requirements = ( HasGluster == true )
 

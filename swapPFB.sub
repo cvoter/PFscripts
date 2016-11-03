@@ -14,8 +14,8 @@ error = $(runname).swapPFB.err
 log = $(runname).swapPFB.log
 
 request_cpus = 1
-request_memory = 100MB
-request_disk = 500MB
+request_memory = 250MB
+request_disk = 1GB
 requirements = ( HasGluster == true )
 
 initialdir = /home/cvoter/Parflow/models/$(runname)
