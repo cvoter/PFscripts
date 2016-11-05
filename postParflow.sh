@@ -82,5 +82,5 @@ sed -n '/Memory (MB)/s/ \+/ /gp' $runname.WB.log | cut -d $'\t' -f2 | cut -d ' '
 #TAR AND DELETE PARFLOWOUT DIR
 cd $GHOME
 cd ..
-tar zcf $GHOME.02.tar.gz $runname
+tar zcf $GHOME.tar.gz $runname
 rm -rf $GHOME

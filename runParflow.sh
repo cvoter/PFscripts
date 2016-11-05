@@ -95,7 +95,6 @@ if [ -z "$ICpressure" ]; then
 else
   #Use last saved pressure file
   cp $runname.info.txt $HOME/$runname/$runname.info.txt
-  cp $runname.kinsol.log $HOME/$runname/$runname.kinsol.log
   export pfStartCount=$(echo $ICpressure | tail -c 10 | sed 's/.\{4\}$//' | sed 's/^0*//')
   export start=$((pfStartCount/drun+1))
   export prettyStart==$(printf "%05d" $pfStartCount)
@@ -107,9 +106,6 @@ cd $HOME/$runname
 # -------------------------------------------
 # INITIALIZE LOGS
 # -------------------------------------------
-# CREATE KINSOL LOG FILE
-printf "\n\n\n============================PF START LOOP: %d...PF START TIME: %d============================\n" $start $pfStartCount >> $runname.kinsol.log
-
 # CREATE INFO FILE
 printf "============================PF START LOOP: %d...PF START TIME: %d============================\n" $start $pfStartCount >> $runname.info.txt
 printf "%s\n" $runname >> $runname.info.txt
@@ -133,7 +129,7 @@ printf "[porosity,Ssat,Sres] = [%.3f, %.2f, %.3f]\n\n\n" $porosity_imperv $Ssat_
 # LOOP THROUGH RUNS
 # -------------------------------------------
 for ((loop=start;loop<=nruns;loop++)); do
-  prettyloop=$(printf "%02d" $loop)
+  prettyloop=$(printf "%04d" $loop)
   #Calculate stop time
   if [ $loop -eq $nruns ]; then
     export pfStopTime=$((totalHr-pfStartCount))
@@ -147,7 +143,6 @@ for ((loop=start;loop<=nruns;loop++)); do
     fi
   fi
   #Record start time in logs
-  printf "\n============================PF START HOUR: %d============================\n" $pfStartCount >> $runname.kinsol.log
   printf "========PF START HOUR %d========\n" $pfStartCount >> $runname.info.txt
   
   # -------------------------------------------
@@ -171,8 +166,8 @@ for ((loop=start;loop<=nruns;loop++)); do
     rm gp.rst."$num".*
   done
 
-  # SAVE PREVIOUS KINSOL LOG
-  cat $runname.out.kinsol.log >> $runname.kinsol.log
+  # RENAME PREVIOUS KINSOL LOG
+  mv $runname.out.kinsol.log $runname.out.$prettyloop.kinsol.log
 
   # SAVE CLM, PROCESSOR, ENDING INFO
   #CLM starting step
@@ -201,8 +196,6 @@ for ((loop=start;loop<=nruns;loop++)); do
   #Logs first
   rm -f $GHOME/$runname.info.txt
   cp $runname.info.txt $GHOME/$runname.info.txt
-  rm -f $GHOME/$runname.kinsol.log
-  cp $runname.kinsol.log $GHOME/$runname.kinsol.log
   #Restart files second
   cp $ICpressure $GHOME/
   cp gp.rst."$prettyStart".* $GHOME/
@@ -215,7 +208,7 @@ for ((loop=start;loop<=nruns;loop++)); do
 
   # REMOVE FILES THAT JUST TRANSFERED, RESET ICPRESSURE
   mkdir $HOME/savethese
-  mv drv_vegm.dat drv_vegp.dat nldas.1hr.clm.txt slopex.pfb slopey.pfb subsurfaceFeature.pfb runParflow.tcl $runname.info.txt $runname.kinsol.log gp.rst."$prettyStart".* $ICpressure $HOME/savethese/
+  mv drv_vegm.dat drv_vegp.dat nldas.1hr.clm.txt slopex.pfb slopey.pfb subsurfaceFeature.pfb runParflow.tcl $runname.info.txt gp.rst."$prettyStart".* $ICpressure $HOME/savethese/
   if [ -e drv_clmin_restart.dat ]; then
     mv drv_clmin_restart.dat $HOME/savethese/drv_clmin.dat
   else mv drv_clmin.dat $HOME/savethese/drv_clmin.dat
@@ -231,7 +224,7 @@ done
 # -------------------------------------------
 cd $GHOME
 for ((loop=1;loop<=nruns;loop++)); do
-  prettyloop=$(printf "%02d" $loop)
+  prettyloop=$(printf "%04d" $loop)
   dirname=$(printf "%s_%s" $runname $prettyloop)
   tar xzf $dirname.tar.gz --strip-components=1
   rm -f $dirname.tar.gz

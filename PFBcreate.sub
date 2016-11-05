@@ -25,65 +25,60 @@ when_to_transfer_output = ON_EXIT
 
 time = A
 t0 = 0
-tf = 24
+tf = 730
 queue
 
-#time = A
-#t0 = 0
-#tf = 430
-#queue
+time = B
+t0 = 730
+tf = 1460
+queue
 
-#time = B
-#t0 = 430
-#tf = 860
-#queue
+time = C
+t0 = 1460
+tf = 2190
+queue
 
-#time = C
-#t0 = 860
-#tf = 1290
-#queue
+time = D
+t0 = 2190
+tf = 2920
+queue
 
-#time = D
-#t0 = 1290
-#tf = 1720
-#queue
+time = E
+t0 = 2920
+tf = 3650
+queue
 
-#time = E
-#t0 = 1720
-#tf = 2150
-#queue
+time = F
+t0 = 3650
+tf = 4380
+queue
 
-#time = F
-#t0 = 2150
-#tf = 2580
-#queue
+time = G
+t0 = 4380
+tf = 5110
+queue
 
-#time = G
-#t0 = 2580
-#tf = 3010
-#queue
+time = H
+t0 = 5110
+tf = 5840
+queue
 
-#time = H
-#t0 = 3010
-#tf = 3440
-#queue
+time = I
+t0 = 5840
+tf = 6570
+queue
 
-#time = I
-#t0 = 3440
-#tf = 3870
-#queue
+time = J
+t0 = 6570
+tf = 7300
+queue
 
-#time = J
-#t0 = 3870
-#tf = 4300
-#queue
+time = K
+t0 = 7300
+tf = 8030
+queue
 
-#time = K
-#t0 = 4300
-#tf = 4730
-#queue
-
-#time = L
-#t0 = 4730
-#tf = 5160
-#queue
+time = L
+t0 = 8030
+tf = 8760
+queue
