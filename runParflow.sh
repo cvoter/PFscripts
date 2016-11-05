@@ -158,6 +158,11 @@ for ((loop=start;loop<=nruns;loop++)); do
   export ICpressure=$(find . -name "$runname.out.press.*.pfb" | sort -n | tail -1 | sed -r 's/^.{2}//')
   export pfStartCount=$(echo $ICpressure | tail -c 10 | sed 's/.\{4\}$//' | sed 's/^0*//')
   export prettyStart=$(printf "%05d" $pfStartCount)
+  if [ $startDelete -eq $pfStartCount ]; then
+    flag=1
+    loop=nruns
+    printf "\n\n=====START IS SAME AS END, ABORT=======\n\n">> $runname.info.txt
+  fi
 
   # DELETE DIST PFBS AND EXTRA CLM RESTARTS
   find . -name "*pfb.dist*" -delete
@@ -229,4 +234,8 @@ for ((loop=1;loop<=nruns;loop++)); do
   tar xzf $dirname.tar.gz --strip-components=1
   rm -f $dirname.tar.gz
 done
-exit 0
+if [ $flag -eq 1 ]; then
+  exit 1
+else
+  exit 0
+fi
