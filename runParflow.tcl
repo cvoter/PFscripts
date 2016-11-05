@@ -310,7 +310,7 @@ pfset KnownSolution						NoKnownSolution
 #------------------------------------------------------------------------------------------
 pfset Solver							Richards
 pfset Solver.MaxIter						20000000
-pfset Solver.MaxConvergenceFailures			9
+pfset Solver.MaxConvergenceFailures			20
 pfset Solver.Drop						1E-20
 pfset Solver.AbsTol						1E-12
 
