@@ -97,7 +97,7 @@ else
   cp $runname.info.txt $HOME/$runname/$runname.info.txt
   export pfStartCount=$(echo $ICpressure | tail -c 10 | sed 's/.\{4\}$//' | sed 's/^0*//')
   export start=$((pfStartCount/drun+1))
-  export prettyStart==$(printf "%05d" $pfStartCount)
+  export prettyStart=$(printf "%05d" $pfStartCount)
   cp gp.rst."$prettyStart".* $HOME/$runname/
 fi
 cp $ICpressure $HOME/$runname/
@@ -227,15 +227,15 @@ done
 # -------------------------------------------
 # UNTAR ALL BACK IN GHOME
 # -------------------------------------------
-cd $GHOME
-for ((loop=1;loop<=nruns;loop++)); do
-  prettyloop=$(printf "%04d" $loop)
-  dirname=$(printf "%s_%s" $runname $prettyloop)
-  tar xzf $dirname.tar.gz --strip-components=1
-  rm -f $dirname.tar.gz
-done
 if [ $flag -eq 1 ]; then
   exit 1
 else
+  cd $GHOME
+  for ((loop=1;loop<=nruns;loop++)); do
+    prettyloop=$(printf "%04d" $loop)
+    dirname=$(printf "%s_%s" $runname $prettyloop)
+    tar xzf $dirname.tar.gz --strip-components=1
+    rm -f $dirname.tar.gz
+  done
   exit 0
 fi
