@@ -22,4 +22,4 @@ set slopey [pfload slopey.sa]
 pfsave $slopey -pfb slopey.pfb
 
 set ICpressure [pfload ICpressure.sa]
-pfsave $ICpressure -pfb $env(runname).out.press.00000.pfb
+pfsave $ICpressure -pfb ICpressure.pfb
