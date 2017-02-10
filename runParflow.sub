@@ -14,8 +14,8 @@ error = $(runname).runPF.err
 log = $(runname).runPF.log
 
 request_cpus = $(np)
-request_memory = 4GB
-request_disk = 5GB
+request_memory = 2GB
+request_disk = 1GB
 requirements = ( HasGluster == true )
 +is_resumable = true
 

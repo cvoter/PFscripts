@@ -12,8 +12,8 @@ error = $(runname).WB.err
 log = $(runname).WB.log
 
 request_cpus = 1
-request_memory = 1GB
-request_disk = 3GB
+request_memory = 2GB
+request_disk = 4GB
 requirements = ( HasGluster == true )
 
 initialdir = /home/cvoter/Parflow/models/$(runname)
