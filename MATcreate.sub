@@ -12,7 +12,7 @@ error = MATcreate/$(runname).$(flux).err
 log = MATcreate/$(runname).$(flux).log
 
 request_cpus = 1
-request_memory = 6GB
+request_memory = 18GB
 request_disk = 5GB
 requirements = ( HasGluster == true )
 
