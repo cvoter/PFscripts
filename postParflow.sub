@@ -21,27 +21,6 @@ requirements = ( HasGluster == true )
 
 initialdir = /home/cvoter/Parflow/models/$(runname)
 transfer_input_files = /home/cvoter/Parflow/models/$(runname)/$(runname).swapPFB.log,\
-/home/cvoter/Parflow/models/$(runname)/PFBcreate/$(runname).Ss.A.log,\
-/home/cvoter/Parflow/models/$(runname)/PFBcreate/$(runname).Sss.A.log,\
-/home/cvoter/Parflow/models/$(runname)/MATcreate/$(runname).can.log,\
-/home/cvoter/Parflow/models/$(runname)/MATcreate/$(runname).etS.log,\
-/home/cvoter/Parflow/models/$(runname)/MATcreate/$(runname).evS.log,\
-/home/cvoter/Parflow/models/$(runname)/MATcreate/$(runname).evV.log,\
-/home/cvoter/Parflow/models/$(runname)/MATcreate/$(runname).infl.log,\
-/home/cvoter/Parflow/models/$(runname)/MATcreate/$(runname).p.log,\
-/home/cvoter/Parflow/models/$(runname)/MATcreate/$(runname).sat.log,\
-/home/cvoter/Parflow/models/$(runname)/MATcreate/$(runname).sno.log,\
-/home/cvoter/Parflow/models/$(runname)/MATcreate/$(runname).sr.log,\
-/home/cvoter/Parflow/models/$(runname)/MATcreate/$(runname).Ss.log,\
-/home/cvoter/Parflow/models/$(runname)/MATcreate/$(runname).Sss.log,\
-/home/cvoter/Parflow/models/$(runname)/MATcreate/$(runname).tr.log,\
-/home/cvoter/Parflow/models/$(runname)/MATcalcs/$(runname).dd.log,\
-/home/cvoter/Parflow/models/$(runname)/MATcalcs/$(runname).ev.log,\
-/home/cvoter/Parflow/models/$(runname)/MATcalcs/$(runname).evL.log,\
-/home/cvoter/Parflow/models/$(runname)/MATcalcs/$(runname).fed.log,\
-/home/cvoter/Parflow/models/$(runname)/MATcalcs/$(runname).re.log,\
-/home/cvoter/Parflow/models/$(runname)/MATcalcs/$(runname).SssRZ.log,\
-/home/cvoter/Parflow/models/$(runname)/MATcalcs/$(runname).tr3D.log,\
 /home/cvoter/Parflow/models/$(runname)/$(runname).WB.log
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT_OR_EVICT
