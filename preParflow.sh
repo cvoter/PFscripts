@@ -26,18 +26,38 @@ export PATH=$MPI_PATH/bin:$PATH
 export LD_LIBRARY_PATH=$TCL_PATH/lib:$LD_LIBRARY_PATH
 export GHOME=/mnt/gluster/cvoter/ParflowOut/$runname
 
-cp $HOME/preParflow.tcl $GHOME/preParflow.tcl
-cd $GHOME
+# -------------------------------------------
+# MOVE FILES AROUND
+# -------------------------------------------
+#UNZIP INPUT TAR
+tar xzf PFin.tar.gz --strip-components=1
+rm -f PFin.tar.gz
+
+#UNZIP SA TAR
+tar xzf SAin.tar.gz --strip-components=1
+rm -f SAin.tar.gz
 
 # -------------------------------------------
 # DO PARFLOW STUFF
 # -------------------------------------------
 tclsh preParflow.tcl
-rm -f preParflow1D.tcl
+rm preParflow.tcl *.sa
 
-MATdir=/mnt/gluster/cvoter/MatlabOut/$runname
-if [ ! -e $MATdir ]; then
-  mkdir $MATdir
-fi
-cp $GHOME/domainInfo.mat $MATdir/
-cp $GHOME/precip.mat $MATdir/
+# -------------------------------------------
+# TAR FILES BACK UP
+# -------------------------------------------
+mkdir PFin
+mv slopex.pfb slopey.pfb subsurfaceFeature.pfb $runname.out.press.00000.pfb PFin/
+mv drv_clmin_start.dat drv_clmin_restart.dat drv_vegm.dat drv_vegp.dat nldas.1hr.clm.txt parameters.txt PFin/
+mv runParflow.tcl PFin/
+
+tar zcf PFin.tar.gz PFin
+rm -rf PFin
+
+# -------------------------------------------
+# SEND INPUT TO GLUSTER
+# -------------------------------------------
+mkdir $GHOME
+cp PFin.tar.gz $GHOME/
+
+

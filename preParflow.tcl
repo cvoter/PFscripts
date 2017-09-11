@@ -10,6 +10,7 @@ package require parflow
 namespace import Parflow::*
 pfset FileVersion 4
 
+set runname $env(runname)
 #------------------------------------------------------------------------------------------
 # Convert to pfb
 #------------------------------------------------------------------------------------------
@@ -22,4 +23,4 @@ set slopey [pfload slopey.sa]
 pfsave $slopey -pfb slopey.pfb
 
 set ICpressure [pfload ICpressure.sa]
-pfsave $ICpressure -pfb ICpressure.pfb
+pfsave $ICpressure -pfb $runname.out.press.00000.pfb

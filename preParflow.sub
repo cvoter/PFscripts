@@ -8,18 +8,19 @@
 #------------------------
 universe = vanilla
 executable = /home/cvoter/Parflow/models/scripts/preParflow.sh
-arguments = $(runname)
-output = $(runname).prePF.out
-error = $(runname).prePF.err
-log = $(runname).prePF.log
+arguments = loc02L
+output = logs/prePF.out
+error = logs/prePF.err
+log = logs/prePF.log
 
 request_cpus = 1
-request_memory = 10MB
-request_disk = 100KB
+request_memory = 1MB
+request_disk = 5MB
 requirements = ( HasGluster == true )
 
-initialdir = /home/cvoter/Parflow/models/$(runname)
-transfer_input_files = /home/cvoter/Parflow/models/scripts/preParflow.tcl
+initialdir = /home/cvoter/Parflow/models/loc02L
+transfer_input_files = /home/cvoter/Parflow/models/loc02L/PFin.tar.gz,\
+/home/cvoter/Parflow/models/loc02L/SAin.tar.gz
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
 
