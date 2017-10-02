@@ -89,7 +89,7 @@ done
 # transpiration (qflx_tran_veg)
 # ------------------------------------------------------------------------------
 nExpected=$totalHr
-tarFlux can_out evaptranssum qflx_evap_soi qflx_evap_veg swe_out overlandsum \
+tarFlux can_out evaptranssum qflx_evap_grnd qflx_evap_veg swe_out overlandsum \
         qflx_tran_veg
 
 # ------------------------------------------------------------------------------
