@@ -5,7 +5,7 @@
 # Executable to set up environmental variables and run ParFlow *.tcl script
 
 
-# ===================================================================================
+# ==============================================================================
 # INTERPRET ARGUMENTS
 # 1 = runname
 # 2 = totalHr = total number of model hours for complete simulation
@@ -15,7 +15,7 @@
 # 6 = np = total number of processors (P*Q)
 # nruns = number of loops to execute, based on total hours and hours per loop
 # R = number of processors for z-axis, always 1.
-# ===================================================================================
+# ==============================================================================
 export runname=$1
 export totalHr=$2
 export drun=$3
@@ -25,12 +25,13 @@ export np=$6
 export nruns=$(((totalHr+drun-1)/drun))
 export R=1
 
-# ===================================================================================
+# ==============================================================================
 # SET ENVIRONMENT VARIABLES
 # Paths for libraries, compilers, relavant directories
-# On HTCondor setup, parflow (and dependent libraries) are installed at "BASE" directory
-# Model output is generated on local machine ("HOME"), then transferred to Gluster fileserver ("GHOME")
-# ===================================================================================
+# On HTCondor setup, parflow + dependent libraries installed in "BASE" directory
+# Model output first generated on local machine ("HOME")
+# Model output then transferred to gluster fileserver ("GHOME")
+# ==============================================================================
 export CC=gcc
 export CXX=g++
 export FC=gfortran
@@ -40,26 +41,38 @@ export BASE=/mnt/gluster/cvoter/ParFlow
 export PARFLOW_DIR=$BASE/parflow
 export HYPRE_PATH=$BASE/hypre-2.9.0b
 export TCL_PATH=$BASE/tcl-8.6.5
+export HDF5_PATH=$BASE/hdf5-1.8.17
+export LD_LIBRARY_PATH=$HDF5_PATH/lib:$LD_LIBRARY_PATH
 export MPI_PATH=/mnt/gluster/chtc/mpich-3.1
 export LD_LIBRARY_PATH=$MPI_PATH/lib:$LD_LIBRARY_PATH
 export PATH=$MPI_PATH/bin:$PATH
 export LD_LIBRARY_PATH=$TCL_PATH/lib:$LD_LIBRARY_PATH
 export GHOME=/mnt/gluster/cvoter/ParflowOut/$runname
 
-# ===================================================================================
+# ==============================================================================
 # CREATE RUN DIRECTORY, UNZIP INPUTS
 # On local machine
-# ===================================================================================
+# ==============================================================================
+#CREATE RUN DIRECTORY
 mkdir $HOME/$runname
-cp $GHOME/PFin.tar.gz $HOME/$runname/
-cd $HOME/$runname
-tar xzf PFin.tar.gz --strip-components=1
-rm -f PFin.tar.gz
 
-# ===================================================================================
+#IDENTIFY CORRECT INPUT TARBALL
+if [ ! -f $GHOME/PFrestart.tar.gz ]; then
+  inputTAR=$GHOME/PFin.tar.gz
+else
+  inputTAR=$GHOME/PFrestart.tar.gz
+fi
+
+#COPY INPUT TARBALL TO RUN DIRECTORY, UNZIP
+cp $inputTAR $HOME/$runname/
+cd $HOME/$runname
+tar xzf $inputTAR --strip-components=1
+rm -f $inputTAR
+
+# ==============================================================================
 # EXPORT KEY DOMAIN VARIABLES
 # All stored in parameters.txt
-# ===================================================================================
+# ==============================================================================
 set -- $(<parameters.txt)
 export xL=$1
 export yL=$2
@@ -93,11 +106,11 @@ export porosity_imperv=${27}
 export Ssat_imperv=${28}
 export Sres_imperv=${29}
 
-# ===================================================================================
+# ==============================================================================
 # DETERMINE STARTING TIMESTEP AND STARTING LOOP
 # Searches for pressure files to determine what last saved timestep was.
 # From this info, sets starting hour (for parflow) and starting loop number.
-# ===================================================================================
+# ==============================================================================
 export ICpressure=$(find . -maxdepth 1 -name "$runname.out.press.*.pfb" | sort -n | tail -1 | sed -r 's/^.{2}//')
 export pfStartCount=$(echo $ICpressure | tail -c 10 | sed 's/.\{4\}$//' | sed 's/^0*//')
 if [ -z "$pfStartCount" ]; then
@@ -109,13 +122,13 @@ else
   export start=$((pfStartCount/drun+1))
 fi
 
-# ===================================================================================
+# ==============================================================================
 # INITIALIZE LOG
-# I keep track of key input paramters and timing information in a customized log file.
-# This allows me to condense key information from the myriad logs parflow generates.
-# Initialize log with runname, date and time, parameter values with units (from parameters.txt)
-# ===================================================================================
-printf "============================PF START LOOP: %d...PF START TIME: %d============================\n" $start $pfStartCount >> $runname.info.txt
+# Track key input paramters and timing information in a customized log file.
+# Allows me to condense key information from the myriad logs parflow generates.
+# Initialize log with runname, date/time, parameter values with units
+# ==============================================================================
+printf "====PF START LOOP: %d...PF START TIME: %d====\n" $start $pfStartCount >> $runname.info.txt
 printf "%s\n" $runname >> $runname.info.txt
 date +"%H:%M:%S %Y-%m-%d" >> $runname.info.txt
 printf "\nPARAMETERS\nUnits: L[=]meters, T[=]hours, M[=]kilograms\nDomain\n" >> $runname.info.txt
@@ -133,17 +146,17 @@ printf "[Ksat,mn] = [%.4e, %.4e]\n" $Ks_imperv $mn_imperv >> $runname.info.txt
 printf "[VGa,VGn] = [%.2f, %.2f]\n" $VGa_imperv $VGn_imperv >> $runname.info.txt
 printf "[porosity,Ssat,Sres] = [%.3f, %.2f, %.3f]\n\n\n" $porosity_imperv $Ssat_imperv $Sres_imperv >> $runname.info.txt
 
-# ===================================================================================
+# ==============================================================================
 # LOOP THROUGH RUNS
 # I execute the entire simulation via many small loops (e.g., 12 hrs at a time).
-# This allows me to send output back to Gluster fileserver at regular intervals,
-# which minimizes the output I lose if model is unable to finish in 72hrs (HTCondor time limit).
-# ===================================================================================
+# Allows me to send output to Gluster fileserver at regular intervals, which
+# minimizes output lost if model does not finish in 72hrs (HTCondor time limit).
+# ==============================================================================
 for ((loop=start;loop<=nruns;loop++)); do
-  # -------------------------------------------
+  # ----------------------------------------------------------------------------
   # SET UP
-  # -------------------------------------------
-  #PRETTY FORMAT OF LOOP NUMBER. USED LATER WHEN RENAME KINSOL LOG AND OUTPUT DIRECTORY.
+  # ----------------------------------------------------------------------------
+  #PRETTY FORMAT OF LOOP NUMBER (used later in renaming output to transfer back)
   prettyLoop=$(printf "%04d" $loop)
 
   #STOP TIME FOR THIS LOOP
@@ -157,29 +170,28 @@ for ((loop=start;loop<=nruns;loop++)); do
   if [ $loop -gt 1 ]; then
     cp -f drv_clmin_restart.dat drv_clmin.dat
   else
-    cp -f drv_climin_start.dat drv_clmin.dat
+    cp -f drv_clmin_start.dat drv_clmin.dat
   fi
 
   #RECORD START INFO IN LOG
   printf "========PF START HOUR %d========\n" $pfStartCount >> $runname.info.txt
   
-  # -------------------------------------------
+  # ----------------------------------------------------------------------------
   # DO PARFLOW STUFF
-  # -------------------------------------------
+  # ----------------------------------------------------------------------------
   tclsh runParflow.tcl
 
-  # -------------------------------------------
+  # ----------------------------------------------------------------------------
   # CLEAN UP
-  # -------------------------------------------
+  # ----------------------------------------------------------------------------
   #FINAL PRESSURE AND TIMING (aka start info for next loop)
   export startDelete=$pfStartCount
   export ICpressure=$(find . -name "$runname.out.press.*.pfb" | sort -n | tail -1 | sed -r 's/^.{2}//')
   export pfStartCount=$(echo $ICpressure | tail -c 10 | sed 's/.\{4\}$//' | sed 's/^0*//')
   export prettyStart=$(printf "%05d" $pfStartCount)
   if [ $startDelete -eq $pfStartCount ]; then
-    flag=1
-    loop=nruns
     printf "\n\n=====START IS SAME AS END, ABORT=======\n\n">> $runname.info.txt
+    exit 1
   fi
 
   #RECORD CLM, PROCESSOR, ENDING INFO IN LOG
@@ -205,35 +217,37 @@ for ((loop=start;loop<=nruns;loop++)); do
   ((sec=T%60, T/=60, min=T%60, hrs=T/60))
   printf "Running total time: %d:%02d:%02d\n\n\n" $hrs $min $sec >> $runname.info.txt
 
-  #DELETE DISTRIBUTED PFBS AND EXTRA CLM RESTARTS (extra files, not needed for post-processing)
+  #DELETE DISTRIBUTED PFBS AND EXTRA CLM RESTARTS (extra files no longer needed)
   find . -name "*pfb.dist*" -delete
   for ((i=startDelete;i<pfStartCount;i++)); do
     num=$(printf "%05d" $i)
     rm gp.rst."$num".*
   done
 
-  #SET ASIDE UPDATED PFin FILES
-  mkdir $HOME/PFin
+  #SET ASIDE UPDATED PFin FILES, now called PFrestart
+  mkdir $HOME/PFrestart
   #Current log
-  mv $runname.info.txt $HOME/PFin/
+  mv $runname.info.txt $HOME/PFrestart/
   #Restart files (pressure and CLM)
-  mv $ICpressure gp.rst."$prettyStart".* $HOME/PFin/
+  cp $ICpressure gp.rst."$prettyStart".* $HOME/PFrestart/
   #Other required inputs
-  mv drv_clmin_start.dat drv_clmin_restart.dat drv_vegm.dat drv_vegp.dat nldas.1hr.clm.txt \
-     slopex.pfb slopey.pfb subsurfaceFeature.pfb runParflow.tcl $HOME/PFin/
+  mv drv_clmin_start.dat drv_clmin_restart.dat drv_vegm.dat drv_vegp.dat \
+     nldas.1hr.clm.txt slopex.pfb slopey.pfb subsurfaceFeature.pfb \
+     runParflow.tcl $HOME/PFrestart/
   #Output that doesn't change with loop, only needs to be saved at very end
   mv $runname.out.mannings.pfb $runname.out.mask.pfb $runname.out.perm_x.pfb \
      $runname.out.perm_y.pfb $runname.out.perm_z.pfb $runname.out.porosity.pfb \
-     $runname.out.slope_x.pfb $runname.out.slope_y.pfb $runname.out.specific_storage.pfb $HOME/PFin/
+     $runname.out.slope_x.pfb $runname.out.slope_y.pfb \
+     $runname.out.specific_storage.pfb $HOME/PFrestart/
 
   #RENAME KINSOL LOG, TEMPORARILY MOVE TO $HOME
   mv $runname.out.kinsol.log $HOME/$runname.out.$prettyLoop.kinsol.log
 
   #DELETE ALL NON-PFB FILES IN OUTPUT DIRECTORY
-  rm -f *.log *.txt* *.dat* *.pfidb
+  rm -f *.log *.txt* *.dat* *.pfidb *.pftcl
 
   #BRING BACK KINSOL LOG TO OUTPUT DIRECTORY
-  $HOME/$runname.out.$prettyLoop.kinsol.log .
+  mv $HOME/$runname.out.$prettyLoop.kinsol.log .
 
   #TAR OUTPUT DIRECTORY, SEND TO GLUSTER
   cd ..
@@ -243,28 +257,26 @@ for ((loop=start;loop<=nruns;loop++)); do
   mv $newdirname.tar.gz $GHOME
   rm -rf $newdirname
 
-  #COPY UPDATED PFin.tar.gz TO GLUSTER
-  tar zcf PFin.tar.gz PFin
-  cp -f PFin.tar.gz $GHOME/
-  rm -rf PFin
+  #COPY UPDATED PFrestart.tar.gz TO GLUSTER, REMOVE PFin.tar.gz if still exists
+  tar zcf PFrestart.tar.gz PFrestart
+  cp -f PFrestart.tar.gz $GHOME/
+  rm -rf PFrestart
+  if [ -f $GHOME/PFin.tar.gz ]; then
+    rm -f $GHOME/PFin.tar.gz
+  fi
 
-  #RECREATE ACTIVE MODEL DIRECTORY, REPOPULATE WITH UPDATED PFin.tar.gz
+  #RECREATE ACTIVE MODEL DIRECTORY, REPOPULATE WITH UPDATED PFrestart.tar.gz
   mkdir $runname
-  mv PFin.tar.gz $runname
+  mv PFrestart.tar.gz $runname
   cd $runname
-  tar xzf PFin.tar.gz --strip-components=1
-  rm -f PFin.tar.gz
+  tar xzf PFrestart.tar.gz --strip-components=1
+  rm -f PFrestart.tar.gz
 done
 
-# ===================================================================================
+# ==============================================================================
 # EXIT
-# Exit with error if a timestep failed (triggered $flag)
 # If succeeded, remove model directory before exiting
-# ===================================================================================
-if [ $flag -eq 1 ]; then
-  exit 1
-else
-  cd $HOME
-  rm -rf $runname
-  exit 0
-fi
+# ==============================================================================
+cd $HOME
+rm -rf $runname
+exit 0

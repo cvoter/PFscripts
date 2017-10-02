@@ -1,4 +1,5 @@
 #  2016.01 Carolyn Voter
+#  Updated 2017.09
 #  Based on getWaterBalance.tcl
 #
 #  Just the parts of the water balance script required for surface storage
@@ -14,41 +15,32 @@ namespace import Parflow::*
 # Import environment variables
 #---------------------------------------------------------
 set runname $env(runname)
-set GHOME $env(GHOME)
+set totalHr $env(totalHr)
 set HOME $env(HOME)
-set t0 $env(t0)
-set tf $env(tf)
 
-#---------------------------------------------------------
-#Setup Total Flux files
-#---------------------------------------------------------
-file mkdir "pfb_Ss"
+cd $HOME/surface_storage
 
 #---------------------------------------------------------
 #Get geometry 
 #---------------------------------------------------------
-cd $GHOME
 set mask             [pfload $runname.out.mask.pfb]
 set top              [pfcomputetop $mask]
-cd $HOME
 
 #---------------------------------------------------------
 #Start Timestep loop
 #---------------------------------------------------------
-for {set i $t0} {$i <= $tf} {incr i} {
+for {set i 0} {$i <= $totalHr} {incr i} {
 # Set pfb filenames and paths
-    set pfb_Ss [format "pfb_Ss/%s.out.Ss.%05d.pfb" $runname $i]
-    cd $GHOME
+    set filename_out [format "%s.out.surface_storage.%05d.pfb" $runname $i]
 
-# Pressure
+# Load Pressure
     set filename [format "%s.out.press.%05d.pfb" $runname $i]
-    set p [pfload $filename]
-    cd $HOME
+    set pressure [pfload $filename]
 
 # Surface Storage
-    set Ss [pfsurfacestorage $top $p]
-    pfsave $Ss -pfb $pfb_Ss  
+    set surface_storage [pfsurfacestorage $top $pressure]
+    pfsave $surface_storage -pfb $filename_out  
     
-    pfdelete $Ss
-    pfdelete $p
+    pfdelete $surface_storage
+    pfdelete $pressure
 }

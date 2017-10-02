@@ -1,26 +1,24 @@
-# runParflow.sub
-# 2016.01 Carolyn Voter
+# regroupParflow.sub
+# 2017.09 Carolyn Voter
 # Submit script to run ParFlow on CHTC resources
 
 #-------------------------------------------------------------------------------
 # ***Run-specific arguments***
-# "runname", "totalHr", "drun", "P", "Q", and "np" must come from DAG
+# "runname", "totalHr", "drun", and "np" must come from DAG
 #-------------------------------------------------------------------------------
 universe = vanilla
-executable = /home/cvoter/Parflow/models/scripts/runParflow.sh
-arguments = $(runname) $(totalHr) $(drun) $(P) $(Q) $(np)
-output = logs/runPF.out
-error = logs/runPF.err
-log = logs/runPF.log
+executable = /home/cvoter/Parflow/models/scripts/regroupParflow.sh
+arguments = $(runname) $(totalHr) $(drun) $(np)
+output = logs/regroupPF.out
+error = logs/regroupPF.err
+log = logs/regroupPF.log
 
-request_cpus = 20
-request_memory = 2GB
+request_cpus = 1
+request_memory = 1GB
 request_disk = 1GB
 requirements = ( HasGluster == true ) && (OpSysMajorVer == 7)
-+is_resumable = true
 
 initialdir = /home/cvoter/Parflow/models/$(runname)
-#transfer_input_files = /home/cvoter/Parflow/models/scripts/runParflow.tcl
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
 

@@ -7,17 +7,18 @@
 arguments = v84 $(runname) $(flux)
 universe = vanilla
 executable = /home/cvoter/Parflow/outputs/chtc_matlab/MATcreate_all/run_MATcreate.sh
-output = MATcreate/$(runname).$(flux).out
-error = MATcreate/$(runname).$(flux).err
-log = MATcreate/$(runname).$(flux).log
+output = logs/MATcreate.$(flux).out
+error = logs/MATcreate.$(flux).err
+log = logs/MATcreate.$(flux).log
 
 request_cpus = 1
-request_memory = 18GB
-request_disk = 5GB
+request_memory = $(mem)
+request_disk = $(disk)
 requirements = ( HasGluster == true )
 
 initialdir = /home/cvoter/Parflow/models/$(runname)
-transfer_input_files = /home/cvoter/Parflow/outputs/chtc_matlab/MATcreate_all/MATcreate
+transfer_input_files = /home/cvoter/Parflow/outputs/chtc_matlab/MATcreate_all/MATcreate,\
+/home/cvoter/Parflow/models/$(runname)/$(flux).tar.gz
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
 

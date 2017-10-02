@@ -1,4 +1,5 @@
 #  2016.01 Carolyn Voter
+#  Updated 2017.09
 #  Based on getWaterBalance.tcl
 #
 #  Just the parts of the water balance script required for subsurface storage
@@ -14,47 +15,38 @@ namespace import Parflow::*
 # Import environment variables
 #---------------------------------------------------------
 set runname $env(runname)
-set GHOME $env(GHOME)
+set totalHr $env(totalHr)
 set HOME $env(HOME)
-set t0 $env(t0)
-set tf $env(tf)
 
-#---------------------------------------------------------
-#Setup Total Flux files
-#---------------------------------------------------------
-file mkdir "pfb_Sss"
+cd $HOME/subsurface_storage
 
 #---------------------------------------------------------
 #Get properties and geometry
 #---------------------------------------------------------
-cd $GHOME
 set specific_storage [pfload $runname.out.specific_storage.pfb]
 set porosity         [pfload $runname.out.porosity.pfb]
 set mask             [pfload $runname.out.mask.pfb]
-cd $HOME
 
 #---------------------------------------------------------
 #Start Timestep loop
 #---------------------------------------------------------
-for {set i $t0} {$i <= $tf} {incr i} {
+for {set i 0} {$i <= $totalHr} {incr i} {
 # Set pfb filenames and paths
-    set pfb_Sss [format "pfb_Sss/%s.out.Sss.%05d.pfb" $runname $i]
-    cd $GHOME
+    set filename_out [format "%s.out.subsurface_storage.%05d.pfb" $runname $i]
 
 # Load Pressure
-    set filename [format "%s.out.p.%05d.pfb" $runname $i]
+    set filename [format "%s.out.press.%05d.pfb" $runname $i]
     set pressure [pfload $filename]
 
-# Saturation
-    set filename [format "%s.out.sat.%05d.pfb" $runname $i]
-    set sat [pfload $filename]
-    cd $HOME
+# Load Saturation
+    set filename [format "%s.out.satur.%05d.pfb" $runname $i]
+    set saturation [pfload $filename]
 
 # Subsurface Storage
-    set Sss [pfsubsurfacestorage $mask $porosity $pressure $sat $specific_storage]
-    pfsave $Sss -pfb $pfb_Sss 
+    set subsurface_storage [pfsubsurfacestorage $mask $porosity $pressure $saturation $specific_storage]
+    pfsave $subsurface_storage -pfb $filename_out 
     
-    pfdelete $Sss
-    pfdelete $sat
+    pfdelete $subsurface_storage
+    pfdelete $saturation
     pfdelete $pressure
 }
