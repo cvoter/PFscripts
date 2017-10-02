@@ -24,9 +24,7 @@ export HOME=$(pwd)
 export BASE=/mnt/gluster/cvoter/ParFlow
 export PARFLOW_DIR=$BASE/parflow
 export HYPRE_PATH=$BASE/hypre-2.9.0b
-export TCL_PATH=$BASE/tcl-8.6.5
-export HDF5_PATH=$BASE/hdf5-1.8.17
-export LD_LIBRARY_PATH=$HDF5_PATH/lib:$LD_LIBRARY_PATH
+export TCL_PATH=$BASE/tcl-8.6.7
 export MPI_PATH=/mnt/gluster/chtc/mpich-3.1
 export LD_LIBRARY_PATH=$MPI_PATH/lib:$LD_LIBRARY_PATH
 export PATH=$MPI_PATH/bin:$PATH
@@ -36,11 +34,13 @@ export GHOME=/mnt/gluster/cvoter/ParflowOut/$runname
 # ==============================================================================
 # SET UP
 # ==============================================================================
-#UNZIP INPUT TAR
+#COPY AND UNZIP INPUT TAR
+cp $GHOME/PFin.tar.gz .
 tar xzf PFin.tar.gz --strip-components=1
 rm -f PFin.tar.gz
 
 #UNZIP SA TAR
+cp $GHOME/SAin.tar.gz .
 tar xzf SAin.tar.gz --strip-components=1
 rm -f SAin.tar.gz
 
@@ -62,5 +62,4 @@ tar zcf PFin.tar.gz PFin
 rm -rf PFin
 
 #SEND THIS INPUT TO GLUSTER AS WELL
-mkdir $GHOME
-cp PFin.tar.gz $GHOME/
+mv PFin.tar.gz $GHOME/

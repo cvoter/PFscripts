@@ -9,9 +9,9 @@
 universe = vanilla
 executable = /home/cvoter/Parflow/models/scripts/regroupParflow.sh
 arguments = $(runname) $(totalHr) $(drun) $(np)
-output = logs/regroupPF.out
-error = logs/regroupPF.err
-log = logs/regroupPF.log
+output = regroupPF.out
+error = regroupPF.err
+log = regroupPF.log
 
 request_cpus = 1
 request_memory = 1GB

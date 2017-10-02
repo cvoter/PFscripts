@@ -40,9 +40,7 @@ export HOME=$(pwd)
 export BASE=/mnt/gluster/cvoter/ParFlow
 export PARFLOW_DIR=$BASE/parflow
 export HYPRE_PATH=$BASE/hypre-2.9.0b
-export TCL_PATH=$BASE/tcl-8.6.5
-export HDF5_PATH=$BASE/hdf5-1.8.17
-export LD_LIBRARY_PATH=$HDF5_PATH/lib:$LD_LIBRARY_PATH
+export TCL_PATH=$BASE/tcl-8.6.7
 export MPI_PATH=/mnt/gluster/chtc/mpich-3.1
 export LD_LIBRARY_PATH=$MPI_PATH/lib:$LD_LIBRARY_PATH
 export PATH=$MPI_PATH/bin:$PATH
@@ -50,7 +48,58 @@ export LD_LIBRARY_PATH=$TCL_PATH/lib:$LD_LIBRARY_PATH
 export GHOME=/mnt/gluster/cvoter/ParflowOut/$runname
 
 # ==============================================================================
-# CREATE RUN DIRECTORY, UNZIP INPUTS
+# DEFINE FUNCTIONS
+# ==============================================================================
+# ------------------------------------------------------------------------------
+# SAVE OUTPUT TO GLUSTER
+# ------------------------------------------------------------------------------
+glusterSave () { 
+    #SET ASIDE FILES NEEDED FOR RESTARTS
+    mkdir $HOME/PFrestart
+    #Current log
+    mv $runname.info.txt $HOME/PFrestart/
+    #Restart files (pressure and CLM)
+    cp $ICpressure gp.rst."$prettyStart".* $HOME/PFrestart/
+    #Other required inputs
+    mv drv_clmin_start.dat drv_clmin_restart.dat drv_vegm.dat drv_vegp.dat \
+       nldas.1hr.clm.txt slopex.pfb slopey.pfb subsurfaceFeature.pfb \
+       runParflow.tcl $HOME/PFrestart/
+    #Output that doesn't change with loop, only needs to be saved at very end
+    mv $runname.out.mannings.pfb $runname.out.mask.pfb $runname.out.perm_x.pfb \
+       $runname.out.perm_y.pfb $runname.out.perm_z.pfb $runname.out.porosity.pfb \
+       $runname.out.slope_x.pfb $runname.out.slope_y.pfb \
+       $runname.out.specific_storage.pfb $HOME/PFrestart/
+
+    #TEMPORARILY MOVE ALL KINSOL LOGS TO $HOME
+    mv $runname.out.*.kinsol.log $HOME/
+
+    #DELETE ALL EXTRA FILES IN OUTPUT DIRECTORY (only keep pfb and gp.rst)
+    rm -f *.log *.txt* *.dat* *.pfidb *.pftcl
+
+    #BRING BACK KINSOL LOGS TO OUTPUT DIRECTORY
+    mv $HOME/$runname.out.*.kinsol.log ./
+
+    #TAR OUTPUT DIRECTORY, SEND TO GLUSTER
+    cd ..
+    newdirname=$(printf "PFout.%s" $prettyGlusterSave)
+    mv $runname $newdirname
+    tar zcf $newdirname.tar.gz $newdirname
+    mv $newdirname.tar.gz $GHOME
+    rm -rf $newdirname
+
+    #COPY UPDATED PFrestart.tar.gz TO GLUSTER
+    tar zcf PFrestart.tar.gz PFrestart
+    cp -f PFrestart.tar.gz $GHOME/
+    rm -rf PFrestart
+
+    #UPDATE lastGluster TIME AND SAVE COUNTERS
+    lastGluster=$(date +%s)
+    numGlusterSave=$((numGlusterSave+1))
+    prettyGlusterSave=$(printf "%03d" $numGlusterSave)
+}
+
+# ==============================================================================
+# 1. CREATE RUN DIRECTORY, UNZIP INPUTS
 # On local machine
 # ==============================================================================
 #CREATE RUN DIRECTORY
@@ -69,8 +118,14 @@ cd $HOME/$runname
 tar xzf $inputTAR --strip-components=1
 rm -f $inputTAR
 
+#INITIALIZE lastGluster TIME AND SAVE COUNTERS
+#Current date-time in seconds
+lastGluster=$(date +%s)
+numGlusterSave=1
+prettyGlusterSave=$(printf "%03d" $numGlusterSave)
+
 # ==============================================================================
-# EXPORT KEY DOMAIN VARIABLES
+# 2. EXPORT KEY DOMAIN VARIABLES
 # All stored in parameters.txt
 # ==============================================================================
 set -- $(<parameters.txt)
@@ -107,7 +162,7 @@ export Ssat_imperv=${28}
 export Sres_imperv=${29}
 
 # ==============================================================================
-# DETERMINE STARTING TIMESTEP AND STARTING LOOP
+# 3. DETERMINE STARTING TIMESTEP AND STARTING LOOP
 # Searches for pressure files to determine what last saved timestep was.
 # From this info, sets starting hour (for parflow) and starting loop number.
 # ==============================================================================
@@ -123,7 +178,7 @@ else
 fi
 
 # ==============================================================================
-# INITIALIZE LOG
+# 4. INITIALIZE LOG
 # Track key input paramters and timing information in a customized log file.
 # Allows me to condense key information from the myriad logs parflow generates.
 # Initialize log with runname, date/time, parameter values with units
@@ -147,7 +202,7 @@ printf "[VGa,VGn] = [%.2f, %.2f]\n" $VGa_imperv $VGn_imperv >> $runname.info.txt
 printf "[porosity,Ssat,Sres] = [%.3f, %.2f, %.3f]\n\n\n" $porosity_imperv $Ssat_imperv $Sres_imperv >> $runname.info.txt
 
 # ==============================================================================
-# LOOP THROUGH RUNS
+# 5. LOOP THROUGH RUNS
 # I execute the entire simulation via many small loops (e.g., 12 hrs at a time).
 # Allows me to send output to Gluster fileserver at regular intervals, which
 # minimizes output lost if model does not finish in 72hrs (HTCondor time limit).
@@ -156,7 +211,7 @@ for ((loop=start;loop<=nruns;loop++)); do
   # ----------------------------------------------------------------------------
   # SET UP
   # ----------------------------------------------------------------------------
-  #PRETTY FORMAT OF LOOP NUMBER (used later in renaming output to transfer back)
+  #PRETTY FORMAT OF LOOP NUMBER (used later in renaming kinsol logs)
   prettyLoop=$(printf "%04d" $loop)
 
   #STOP TIME FOR THIS LOOP
@@ -185,7 +240,7 @@ for ((loop=start;loop<=nruns;loop++)); do
   # CLEAN UP
   # ----------------------------------------------------------------------------
   #FINAL PRESSURE AND TIMING (aka start info for next loop)
-  export startDelete=$pfStartCount
+  export startDelete=$((pfStartCount+1))
   export ICpressure=$(find . -name "$runname.out.press.*.pfb" | sort -n | tail -1 | sed -r 's/^.{2}//')
   export pfStartCount=$(echo $ICpressure | tail -c 10 | sed 's/.\{4\}$//' | sed 's/^0*//')
   export prettyStart=$(printf "%05d" $pfStartCount)
@@ -224,59 +279,31 @@ for ((loop=start;loop<=nruns;loop++)); do
     rm gp.rst."$num".*
   done
 
-  #SET ASIDE UPDATED PFin FILES, now called PFrestart
-  mkdir $HOME/PFrestart
-  #Current log
-  mv $runname.info.txt $HOME/PFrestart/
-  #Restart files (pressure and CLM)
-  cp $ICpressure gp.rst."$prettyStart".* $HOME/PFrestart/
-  #Other required inputs
-  mv drv_clmin_start.dat drv_clmin_restart.dat drv_vegm.dat drv_vegp.dat \
-     nldas.1hr.clm.txt slopex.pfb slopey.pfb subsurfaceFeature.pfb \
-     runParflow.tcl $HOME/PFrestart/
-  #Output that doesn't change with loop, only needs to be saved at very end
-  mv $runname.out.mannings.pfb $runname.out.mask.pfb $runname.out.perm_x.pfb \
-     $runname.out.perm_y.pfb $runname.out.perm_z.pfb $runname.out.porosity.pfb \
-     $runname.out.slope_x.pfb $runname.out.slope_y.pfb \
-     $runname.out.specific_storage.pfb $HOME/PFrestart/
+  # RENAME KINSOL LOG
+  mv $runname.out.kinsol.log $runname.out.$prettyLoop.kinsol.log
 
-  #RENAME KINSOL LOG, TEMPORARILY MOVE TO $HOME
-  mv $runname.out.kinsol.log $HOME/$runname.out.$prettyLoop.kinsol.log
-
-  #DELETE ALL NON-PFB FILES IN OUTPUT DIRECTORY
-  rm -f *.log *.txt* *.dat* *.pfidb *.pftcl
-
-  #BRING BACK KINSOL LOG TO OUTPUT DIRECTORY
-  mv $HOME/$runname.out.$prettyLoop.kinsol.log .
-
-  #TAR OUTPUT DIRECTORY, SEND TO GLUSTER
-  cd ..
-  newdirname=$(printf "PFout.%s" $prettyLoop)
-  mv $runname $newdirname
-  tar zcf $newdirname.tar.gz $newdirname
-  mv $newdirname.tar.gz $GHOME
-  rm -rf $newdirname
-
-  #COPY UPDATED PFrestart.tar.gz TO GLUSTER, REMOVE PFin.tar.gz if still exists
-  tar zcf PFrestart.tar.gz PFrestart
-  cp -f PFrestart.tar.gz $GHOME/
-  rm -rf PFrestart
-  if [ -f $GHOME/PFin.tar.gz ]; then
-    rm -f $GHOME/PFin.tar.gz
+  # ----------------------------------------------------------------------------
+  # TRANSFER TO GLUSTER 
+  # Only if > 1hr since last transfer
+  # ----------------------------------------------------------------------------
+  timeElapsed="$(($(date +%s)-lastGluster))"
+  timeElapsedHrs=$((timeElapsed/3600))
+  if [ $timeElapsedHrs -ge 1 ]; then
+    glusterSave
+    
+    #RECREATE ACTIVE MODEL DIRECTORY, REPOPULATE WITH UPDATED PFrestart.tar.gz
+    mkdir $runname
+    mv PFrestart.tar.gz $runname
+    cd $runname
+    tar xzf PFrestart.tar.gz --strip-components=1
+    rm -f PFrestart.tar.gz
   fi
-
-  #RECREATE ACTIVE MODEL DIRECTORY, REPOPULATE WITH UPDATED PFrestart.tar.gz
-  mkdir $runname
-  mv PFrestart.tar.gz $runname
-  cd $runname
-  tar xzf PFrestart.tar.gz --strip-components=1
-  rm -f PFrestart.tar.gz
 done
 
 # ==============================================================================
-# EXIT
-# If succeeded, remove model directory before exiting
+# 6. EXIT
+# If succeeded, remove remaining model files before exiting
 # ==============================================================================
 cd $HOME
-rm -rf $runname
+rm -f PFrestart.tar.gz
 exit 0

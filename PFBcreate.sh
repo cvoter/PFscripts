@@ -29,9 +29,7 @@ export HOME=$(pwd)
 export BASE=/mnt/gluster/cvoter/ParFlow
 export PARFLOW_DIR=$BASE/parflow
 export HYPRE_PATH=$BASE/hypre-2.9.0b
-export TCL_PATH=$BASE/tcl-8.6.5
-export HDF5_PATH=$BASE/hdf5-1.8.17
-export LD_LIBRARY_PATH=$HDF5_PATH/lib:$LD_LIBRARY_PATH
+export TCL_PATH=$BASE/tcl-8.6.7
 export MPI_PATH=/mnt/gluster/chtc/mpich-3.1
 export LD_LIBRARY_PATH=$MPI_PATH/lib:$LD_LIBRARY_PATH
 export PATH=$MPI_PATH/bin:$PATH
@@ -39,45 +37,29 @@ export LD_LIBRARY_PATH=$TCL_PATH/lib:$LD_LIBRARY_PATH
 export GHOME=/mnt/gluster/cvoter/ParflowOut/$runname
 
 # ==============================================================================
-# CLEAN UP AFTER PREVIOUS STEPS
-# If make it this far, then regroupParflow.sh must have executed successfully
-# Outputs now reside in submit-5 server home directory, so remove from gluster
-# Use this job to transfer PFrestart.tar.gz to home directory as well
-# ==============================================================================
-#OUTPUTS IN GLUSTER, ORGANIZED BY LOOP
-for tarball in "$GHOME/PFout.*.tar.gz"; do
-  rm $tarball
-done
-
-#RESTART INFO (includes *.pfb files with domain info that is not time-dependent)
-cp $GHOME/PFrestart.tar.gz $HOME
-
-# ==============================================================================
 # MANAGE INPUTS
-# Remove satur.tar.gz if working on surface_storage (unneeded)
+# Copy flux info in (press.tar.gz for both, satur.tar.gz only for subsurface)
 # Get other required *.pfb files from Gluster (all in PFin.tar.gz)
-# Move tarballs into flux directory, untar all there 
+# Extract all from tarballs 
 # ==============================================================================
-#DELETE satur.tar.gz IF UNEEDED
-if [ "$flux" = "surface_storage" ]; then
-  rm -f satur.tar.gz
-fi
-
 #CREATE RUN DIRECTORY
 mkdir $flux
 
-#COPY TARBALLS TO RUN DIRECTORY AND EXTRACT
-mv *.tar.gz $flux/
+#COPY FLUX INFO 
+cp $GHOME/press.tar.gz $HOME/$flux
+if [ "$flux" = "subsurface_storage" ]; then
+  cp $GHOME/satur.tar.gz $HOME/$flux
+fi
+
+#COPY RESTART INFO (includes *.pfb files with domain info that is not time-dependent)
+cp $GHOME/PFrestart.tar.gz $HOME/$flux
+
+#EXTRACT TARBALLS
 cd $HOME/$flux
 for tarball in *.tar.gz; do
   tar xzf $tarball --strip-components=1
-  if [ "$tarball" != "PFrestart.tar.gz" ]; then
-   rm $tarball
-  fi
+  rm $tarball
 done
-
-#MOVE PFrestart UP A LEVEL (so it's transferred to submit-5 home at end of job)
-mv PFrestart.tar.gz $HOME/
 
 # ==============================================================================
 # DO PARFLOW STUFF
@@ -113,7 +95,8 @@ rm -f $runname.out.mannings.pfb $runname.out.mask.pfb $runname.out.perm_x.pfb \
      slopex.pfb slopey.pfb subsurfaceFeature.pfb runParflow.tcl \
      $runname.info.txt gp.rst.*
 
-#TAR REMAINING FILES (should be just the new flux left)
+#TAR REMAINING FILES AND COPY TO GLUSTER(should be just the new flux left)
 cd $HOME
 tar zcf $flux.tar.gz $flux
+mv $flux.tar.gz $GHOME/
 rm -rf $flux

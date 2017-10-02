@@ -9,9 +9,9 @@
 universe = vanilla
 executable = /home/cvoter/Parflow/models/scripts/preParflow.sh
 arguments = $(runname)
-output = logs/prePF.out
-error = logs/prePF.err
-log = logs/prePF.log
+output = prePF.out
+error = prePF.err
+log = prePF.log
 
 request_cpus = 1
 request_memory = 1MB
@@ -19,8 +19,8 @@ request_disk = 5MB
 requirements = ( HasGluster == true ) && (OpSysMajorVer == 7)
 
 initialdir = /home/cvoter/Parflow/models/$(runname)
-transfer_input_files = /home/cvoter/Parflow/models/$(runname)/PFin.tar.gz,\
-/home/cvoter/Parflow/models/$(runname)/SAin.tar.gz
+transfer_input_files = /home/cvoter/Parflow/models/scripts/preParflow.tcl,\
+transfer_input_files = /home/cvoter/Parflow/models/scripts/runParflow.tcl
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
 

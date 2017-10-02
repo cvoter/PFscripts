@@ -9,9 +9,9 @@
 universe = vanilla
 executable = /home/cvoter/Parflow/models/scripts/runParflow.sh
 arguments = $(runname) $(totalHr) $(drun) $(P) $(Q) $(np)
-output = logs/runPF.out
-error = logs/runPF.err
-log = logs/runPF.log
+output = runPF.out
+error = runPF.err
+log = runPF.log
 
 request_cpus = 20
 request_memory = 2GB
@@ -20,7 +20,6 @@ requirements = ( HasGluster == true ) && (OpSysMajorVer == 7)
 +is_resumable = true
 
 initialdir = /home/cvoter/Parflow/models/$(runname)
-#transfer_input_files = /home/cvoter/Parflow/models/scripts/runParflow.tcl
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
 

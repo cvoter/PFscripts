@@ -4,17 +4,17 @@
 # ***Run-specific arguments***
 # arguments = <Matlab version> <runname> <flux>
 #------------------------
-arguments = v84 $(runname) $(flux)
+arguments = v84 $(runname) $(flux) $(mem) $(disk)
 universe = vanilla
 executable = /home/cvoter/Parflow/outputs/chtc_matlab/MATcalcs_all/run_MATcalcs.sh
-output = MATcalcs/$(runname).$(flux).out
-error = MATcalcs/$(runname).$(flux).err
-log = MATcalcs/$(runname).$(flux).log
+output = MATcalcs.$(flux).out
+error = MATcalcs.$(flux).err
+log = MATcalcs.$(flux).log
 
 request_cpus = 1
-request_memory = 18GB
-request_disk = 4GB
-requirements = ( HasGluster == true )
+request_memory = $(mem)
+request_disk =  $(disk)
+requirements = ( HasGluster == true ) && (OpSysMajorVer == 7)
 
 initialdir = /home/cvoter/Parflow/models/$(runname)
 transfer_input_files = /home/cvoter/Parflow/outputs/chtc_matlab/MATcalcs_all/MATcalcs

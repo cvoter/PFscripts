@@ -27,21 +27,10 @@ export HOME=$(pwd)
 export GHOME=/mnt/gluster/cvoter/ParflowOut/$runname
 
 # ==============================================================================
-# COPY TARBALLS TO LOCAL MACHINE AND EXTRACT
-# ==============================================================================
-mkdir $runname
-cp -r $GHOME/. $HOME/$runname
-cd $HOME/$runname
-for tarball in *.tar.gz; do
-  tar xzf $tarball --strip-components=1
-  rm $tarball
-done
-
-# ==============================================================================
-# TAR BY FLUX
+# DEFINE FUNCTIONS
 # ==============================================================================
 # ------------------------------------------------------------------------------
-# DEFINE FUNCTION TO CREATE TARBALL OF SPECIFIED FLUX(ES)
+# CREATE TARBALL OF SPECIFIED FLUX(ES)
 # ------------------------------------------------------------------------------
 tarFlux () { 
     for flux in $@; do
@@ -49,6 +38,8 @@ tarFlux () {
       #CHECK NUMBER OF FILES
       if [ "$flux" = "clm_restart" ]; then
         thisfiletype=gp.rst.*
+      elif [ "$flux" = "clm_restart" ]; then
+        thisfiletype=*.kinsol.log
       else
         thisfiletype=$runname.out.$flux.*.pfb
       fi
@@ -73,6 +64,20 @@ tarFlux () {
     done
 }
 
+# ==============================================================================
+# COPY ORIGINAL TARBALLS TO LOCAL MACHINE AND EXTRACT
+# ==============================================================================
+mkdir $runname
+cp -r $GHOME/. $HOME/$runname
+cd $HOME/$runname
+for tarball in *.tar.gz; do
+  tar xzf $tarball --strip-components=1
+  rm $tarball
+done
+
+# ==============================================================================
+# TAR BY FLUX
+# ==============================================================================
 # ------------------------------------------------------------------------------
 # FLUXES WITHOUT A "ZERO" HOUR FILE
 # canopy water (can_out)
@@ -101,3 +106,22 @@ tarFlux press satur
 # ------------------------------------------------------------------------------
 nExpected=$((nruns*np))
 tarFlux clm_restart
+
+# ------------------------------------------------------------------------------
+# LOG FILES
+# kinsol log files (kinsol)
+# ------------------------------------------------------------------------------
+nExpected=$nruns
+tarFlux kinsol
+
+# ==============================================================================
+# MOVE NEW TARBALLS TO GLUSTER, DELETE OLD TARBALLS
+# ==============================================================================
+cd $HOME/$runname
+for tarball in *.tar.gz; do
+  mv $tarball $GHOME/
+done
+
+for tarball in "$GHOME/PFout.*.tar.gz"; do
+  rm $tarball
+done

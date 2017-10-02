@@ -9,19 +9,17 @@
 universe = vanilla
 executable = /home/cvoter/Parflow/models/scripts/postParflow.sh
 arguments = $(runname)
-output = $(runname).postPF.out
-error = $(runname).postPF.err
-log = $(runname).postPF.log
+output = postPF.out
+error = postPF.err
+log = postPF.log
 
 request_cpus = 1
 request_memory = 1GB
 request_disk = 1GB
-requirements = ( HasGluster == true )
+requirements = ( HasGluster == true ) && (OpSysMajorVer == 7)
 +is_resumable = true
 
 initialdir = /home/cvoter/Parflow/models/$(runname)
-transfer_input_files = /home/cvoter/Parflow/models/$(runname)/$(runname).swapPFB.log,\
-/home/cvoter/Parflow/models/$(runname)/$(runname).WB.log
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT_OR_EVICT
 
