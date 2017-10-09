@@ -35,12 +35,12 @@ export GHOME=/mnt/gluster/cvoter/ParflowOut/$runname
 # SET UP
 # ==============================================================================
 #COPY AND UNZIP INPUT TAR
-cp $GHOME/PFin.tar.gz .
+cp $GHOME/PFin.tar.gz $HOME/
 tar xzf PFin.tar.gz --strip-components=1
 rm -f PFin.tar.gz
 
 #UNZIP SA TAR
-cp $GHOME/SAin.tar.gz .
+cp $GHOME/SAin.tar.gz $HOME/
 tar xzf SAin.tar.gz --strip-components=1
 rm -f SAin.tar.gz
 
