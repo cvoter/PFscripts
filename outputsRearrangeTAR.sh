@@ -1,30 +1,18 @@
 #!/bin/bash
-# 2017.09 Carolyn Voter
-# regroupParflow.sh
-# Takes periodically saved output and rearranges it by flux
+# Carolyn Voter
+# outputsRearrangeTar.sh
+# Takes periodically saved output from parflow model and rearranges it by flux
 
-
-# ==============================================================================
-# INTERPRET ARGUMENTS
-# 1 = runname
-# 2 = totalHr = total number of model hours for complete simulation
-# 3 = drun = number of model hours per loop
-# 4 = np = total number of processors (P*Q)
-# nruns = number of loops to execute, based on total hours and hours per loop
-# ==============================================================================
-export runname=$1
-export totalHr=$2
-export drun=$3
-export np=$4
-export nruns=$(((totalHr+drun-1)/drun))
-
-# ==============================================================================
-# SET ENVIRONMENT VARIABLES
-# Model output first generated on local machine ("HOME")
-# Model output then transferred to gluster fileserver ("GHOME")
-# ==============================================================================
-export HOME=$(pwd)
-export GHOME=/mnt/gluster/cvoter/ParflowOut/$runname
+# Usage: sh outputsRearrangeTar.sh
+# Requires the following environment variables to be defined in parent script:
+# HOME - path of working directory on local machine
+# GHOME - path to where inputs and outputs are stored
+# SCRIPTS - path to where PFscripts are stored
+# runname - name of modeling run
+# totalHr - total number of modeling hours to simulate
+# drun - number of model hours per loop, before saving (typically 12hrs)
+# nruns - number of loops to run in order to complete simulation.
+# np - number of processors the job used to run
 
 # ==============================================================================
 # DEFINE FUNCTIONS
@@ -38,7 +26,7 @@ tarFlux () {
       #CHECK NUMBER OF FILES
       if [ "$flux" = "clm_restart" ]; then
         thisfiletype=gp.rst.*
-      elif [ "$flux" = "clm_restart" ]; then
+      elif [ "$flux" = "kinsol" ]; then
         thisfiletype=*.kinsol.log
       else
         thisfiletype=$runname.out.$flux.*.pfb
@@ -54,7 +42,7 @@ tarFlux () {
       mv $thisfiletype $HOME/$flux/
     
       #TAR AND REMOVE DIRECTORY
-      cd ..
+      cd $HOME
       tar zcf $flux.tar.gz $flux
       rm -rf $flux 
     
@@ -67,7 +55,7 @@ tarFlux () {
 # ==============================================================================
 # COPY ORIGINAL TARBALLS TO LOCAL MACHINE AND EXTRACT
 # ==============================================================================
-mkdir $runname
+mkdir $HOME/$runname
 cp -r $GHOME/. $HOME/$runname
 cd $HOME/$runname
 for tarball in *.tar.gz; do
@@ -117,7 +105,7 @@ tarFlux kinsol
 # ==============================================================================
 # MOVE NEW TARBALLS TO GLUSTER, DELETE OLD TARBALLS
 # ==============================================================================
-cd $HOME/$runname
+cd $HOME
 for tarball in *.tar.gz; do
   mv $tarball $GHOME/
 done

@@ -1,65 +1,55 @@
 #!/bin/bash
-# 2016.01 Carolyn Voter
-# preParflow.sh
-# Executable to setup environment variables and call preParflow.tcl
+# Carolyn Voter
+# inputsConvertSA.sh
+# Gathers input *.sa data, calls inputsConvertSA.tcl, and regroups for model run
+
+# Usage: sh inputsConvertSA.sh
+# Requires the following environment variables to be defined in parent script:
+# runname - name of modeling run
+# HOME = path of working directory on local machine
+# GHOME - path to where inputs and outputs are stored
+# PARFLOW_DIR - path to where parflow libraries are stored
+# SCRIPTS - path to where PFscripts are stored
 
 # ==============================================================================
-# INTERPRET ARGUMENTS
-# 1 = runname
+# DEFINE FUNCTIONS
 # ==============================================================================
-export runname=$1
+#Untar to current directory from GHOME
+copyUntarHere () {
+    for tarDir in $@; do
+	    cp $GHOME/$tarDir.tar.gz $HOME/$runname
+        tar xzf $tarDir.tar.gz --strip-components=1
+        rm -f $tarDir.tar.gz  
+    done
+}
+
+#Tar and move to GHOME
+tarAndMove () {
+    for tarDir in $@; do
+	    tar zcf $tarDir.tar.gz $tarDir
+		mv -f $tarDir.tar.gz $GHOME/
+        rm -rf $tarDir 
+    done
+}
 
 # ==============================================================================
-# SET ENVIRONMENT VARIABLES
-# Paths for libraries, compilers, relavant directories
-# On HTCondor setup, parflow + dependent libraries installed in "BASE" directory
-# Model output first generated on local machine ("HOME")
-# Model output then transferred to gluster fileserver ("GHOME")
+# GET INPUT FILES
 # ==============================================================================
-export CC=gcc
-export CXX=g++
-export FC=gfortran
-export F77=gfortran
-export HOME=$(pwd)
-export BASE=/mnt/gluster/cvoter/ParFlow
-export PARFLOW_DIR=$BASE/parflow
-export HYPRE_PATH=$BASE/hypre-2.9.0b
-export TCL_PATH=$BASE/tcl-8.6.7
-export MPI_PATH=/mnt/gluster/chtc/mpich-3.1
-export LD_LIBRARY_PATH=$MPI_PATH/lib:$LD_LIBRARY_PATH
-export PATH=$MPI_PATH/bin:$PATH
-export LD_LIBRARY_PATH=$TCL_PATH/lib:$LD_LIBRARY_PATH
-export GHOME=/mnt/gluster/cvoter/ParflowOut/$runname
-
-# ==============================================================================
-# SET UP
-# ==============================================================================
-#COPY AND UNZIP INPUT TAR
-cp $GHOME/PFin.tar.gz $HOME/
-tar xzf PFin.tar.gz --strip-components=1
-rm -f PFin.tar.gz
-
-#UNZIP SA TAR
-cp $GHOME/SAin.tar.gz $HOME/
-tar xzf SAin.tar.gz --strip-components=1
-rm -f SAin.tar.gz
+mkdir $HOME/$runname
+cd $HOME/$runname
+copyUntarHere PFin SAin
 
 # ==============================================================================
 # DO PARFLOW STUFF
 # ==============================================================================
-tclsh preParflow.tcl
-rm -f preParflow.tcl *.sa
+tclsh inputsConvertSA.tcl
 
 # ==============================================================================
 # CLEAN UP
 # ==============================================================================
+rm -f inputsConvertSA.tcl *.sa
+
 #TAR BACK UP ALL INPUT FILES (will replace old PFin.tar.gz)
 mkdir PFin
-mv slopex.pfb slopey.pfb subsurfaceFeature.pfb $runname.out.press.00000.pfb \
-   drv_clmin_start.dat drv_clmin_restart.dat drv_vegm.dat drv_vegp.dat \
-   nldas.1hr.clm.txt parameters.txt runParflow.tcl PFin/
-tar zcf PFin.tar.gz PFin
-rm -rf PFin
-
-#SEND THIS INPUT TO GLUSTER AS WELL
-mv PFin.tar.gz $GHOME/
+mv * PFin/
+tarAndMove PFin
