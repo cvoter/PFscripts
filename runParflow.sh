@@ -127,12 +127,12 @@ fi
 
 #If model is finished, abort here.
 if [[ $totalHr -eq $pfStartCount ]]; then
-    sh logComments.sh modelDone
+    sh $SCRIPTS/logComments.sh modelDone
 	exit 0
 fi
 
 #Initialize master log file by recording runname, date/time, input parameters
-sh logComments.sh initialize
+sh $SCRIPTS/logComments.sh initialize
 
 #Initialize time counters for saving output to gluster
 updateTimeCounters
@@ -159,7 +159,7 @@ for ((loop=start;loop<=nruns;loop++)); do
     fi
 
     #Record start in log
-    sh logComments.sh loopStart
+    sh $SCRIPTS/logComments.sh loopStart
   
     # --------------------------------------------------------------------------
     # B. DO PARFLOW STUFF
@@ -174,11 +174,11 @@ for ((loop=start;loop<=nruns;loop++)); do
     findNextStart
     export prettyStart=$(printf "%05d" $pfStartCount)
     if [[ $startDelete -eq $pfStartCount ]]; then
-        sh logComments.sh startIsEnd
+        sh $SCRIPTS/logComments.sh startIsEnd
     fi
 
     #Record end in log
-    sh logComments.sh loopEnd
+    sh $SCRIPTS/logComments.sh loopEnd
 
     #Delete extra files no longer needed
     find . -name "*pfb.dist*" -delete
@@ -199,7 +199,7 @@ for ((loop=start;loop<=nruns;loop++)); do
     #Only save if > 1hr since last transfer
     if [ $timeElapsedHrs -ge 1 ]; then
         #Save and update save time counters
-        sh saveCurrentOutputs.sh
+        sh $SCRIPTS/saveCurrentOutputs.sh
         updateTimeCounters
         #Repopulate local machine with PFrestart.tar.gz
         mkdir $HOME/$runname
@@ -211,5 +211,5 @@ done
 # ------------------------------------------------------------------------------
 # 5. FINISH PARFLOW MODEL
 # ------------------------------------------------------------------------------
-sh saveCurrentOutputs.sh
+sh $SCRIPTS/saveCurrentOutputs.sh
 exit 0

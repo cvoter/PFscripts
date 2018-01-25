@@ -27,7 +27,6 @@ tarInput () {
         elif [ "$inputDir" = "PFin" ]; then
             mv drv_clmin_start.dat drv_clmin_restart.dat drv_vegm.dat drv_vegp.dat nldas.1hr.clm.txt parameters.txt $inputDir/
             cp $SCRIPTS/runParflow.tcl $inputDir/
-			cp $SCRIPTS/logComments.sh $SCRIPTS/saveCurrentOutputs.sh $inputDir/
         else
             mv domainInfo.mat precip.mat $inputDir/
         fi
