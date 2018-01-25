@@ -8,7 +8,7 @@
 # ==============================================================================
 #SBATCH --partition=pre
 #SBATCH --time=24:00:00
-#SBATCH --ntasks=1
+#SBATCH --ntasks=20
 #SBATCH --nodes=1
 #SBATCH --error=/home/cvoter/Jobs/%J.err
 #SBATCH --output=/home/cvoter/Jobs/%J.out
@@ -36,7 +36,7 @@ export PARFLOW_DIR=$BASE/parflow
 export TCL_PATH=$BASE/tcl-8.6.8
 export LD_LIBRARY_PATH=$TCL_PATH/lib:$LD_LIBRARY_PATH
 export HOME=/scratch/local/cvoter
-export GHOME=/home/cvoter/$runname
+export GHOME=/home/cvoter/PFoutputs/$runname
 export SCRIPTS=/home/cvoter/PFscripts
 
 # ==============================================================================
@@ -57,10 +57,16 @@ sh $SCRIPTS/inputsConvertSA.sh
 # ==============================================================================
 # 3. RUN PARFLOW MODEL
 # ==============================================================================
+export HOME=/home/cvoter/PFworking/working.$runname
+mkdir $HOME
+
 printf "\n\n"
 date +"%H:%M:%S %Y-%m-%d"
 printf "Running parflow model files....\n"
 sh $SCRIPTS/runParflow.sh
+
+rm -rf $HOME
+export HOME=/scratch/local/cvoter
 
 # ==============================================================================
 # 4. REARRANGE OUTPUTS
