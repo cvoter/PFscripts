@@ -17,9 +17,12 @@ set runname $env(runname)
 set subsurfaceFeature [pfload subsurfaceFeature.sa]
 pfsave $subsurfaceFeature -pfb subsurfaceFeature.pfb
 
-set slopex [pfload slopex.sa]
+set dem [pfload -sa dem.sa]
+pfsetgrid {420 216 1} {0 0 0} {0.5 0.5 1} $dem
+
+set slopex [pfslopex $dem]
 pfsave $slopex -pfb slopex.pfb
-set slopey [pfload slopey.sa]
+set slopey [pfslopey $dem]
 pfsave $slopey -pfb slopey.pfb
 
 set ICpressure [pfload ICpressure.sa]

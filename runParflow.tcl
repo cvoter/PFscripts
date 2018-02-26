@@ -89,6 +89,37 @@ pfset ComputationalGrid.NY					$ny
 pfset ComputationalGrid.NZ					$nz
 
 #------------------------------------------------------------------------------------------
+# Variable DZ (6.1.14)
+#------------------------------------------------------------------------------------------
+pfset Solver.Nonlinear.VariableDz				True
+pfset dzScale.GeomNames					domain
+pfset dzScale.Type						nzList
+pfset dzScale.nzListNumber					$nz
+pfset Cell.0.dzScale.Value					1.0
+pfset Cell.1.dzScale.Value					1.0
+pfset Cell.2.dzScale.Value					1.0
+pfset Cell.3.dzScale.Value					1.0
+pfset Cell.4.dzScale.Value					1.0
+pfset Cell.5.dzScale.Value					1.0
+pfset Cell.6.dzScale.Value					1.0
+pfset Cell.7.dzScale.Value					0.5
+pfset Cell.8.dzScale.Value					0.5
+pfset Cell.9.dzScale.Value					0.25
+pfset Cell.10.dzScale.Value					0.25
+pfset Cell.11.dzScale.Value					0.25
+pfset Cell.12.dzScale.Value					0.25
+pfset Cell.13.dzScale.Value					0.1
+pfset Cell.14.dzScale.Value					0.1
+pfset Cell.15.dzScale.Value					0.1
+pfset Cell.16.dzScale.Value					0.1
+pfset Cell.17.dzScale.Value					0.1
+pfset Cell.18.dzScale.Value					0.1
+pfset Cell.19.dzScale.Value					0.1
+pfset Cell.20.dzScale.Value					0.1
+pfset Cell.21.dzScale.Value					0.1
+pfset Cell.22.dzScale.Value					0.1
+
+#------------------------------------------------------------------------------------------
 # Geometry: Geometry Input (6.1.4)
 #------------------------------------------------------------------------------------------
 pfset GeomInput.Names					"domain_input indicator_input"
