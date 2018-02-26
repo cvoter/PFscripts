@@ -3,6 +3,8 @@
 # HPCmodelParflow.sh
 # Establishes HPC environment variables before calling runParflow executable.
 
+# Usage: sbatch HPCmodelParflow.sh runname totalHr drun np
+
 # ==============================================================================
 # SLURM REQUESTS
 # ==============================================================================
