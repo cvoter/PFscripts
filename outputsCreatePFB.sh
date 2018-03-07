@@ -40,10 +40,18 @@ mkdir $HOME/$flux
 cd $HOME/$flux
 
 if [ "$flux" = "subsurface_storage" ]; then
-    copyUntarHere press satur PFrestart
+    copyUntarHere press satur PFin PFrestart
 else
-    copyUntarHere press PFrestart
+    copyUntarHere press PFin PFrestart
 fi
+
+# ==============================================================================
+# EXPORT KEY DOMAIN VARIABLES FROM parameters.txt
+# ==============================================================================
+set -- $(<parameters.txt)
+export xU=${10}
+export yU=${11}
+export domainArea=$(bc <<< "$xU * $yU")
 
 # ==============================================================================
 # DO PARFLOW STUFF
@@ -53,6 +61,12 @@ tclsh $SCRIPTS/$flux.tcl
 # ==============================================================================
 # CLEAN UP
 # ==============================================================================
+#Move summary *.txt files to GHOME
+if [ ! -d $GHOME/water_balance ]; then
+    mkdir $GHOME/water_balance
+fi
+mv *storage_*.txt $GHOME/water_balance
+
 #Delete everything except new flux *.pfbs
 keepnames=$runname.out.$flux*
 find . ! -name "${keepnames}" -delete
