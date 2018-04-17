@@ -8,8 +8,8 @@
 # ==============================================================================
 # SLURM REQUESTS
 # ==============================================================================
-#SBATCH --partition=pre
-#SBATCH --time=24:00:00
+#SBATCH --partition=loheide3
+#SBATCH --time=7-00:00:00
 #SBATCH --ntasks=20
 #SBATCH --nodes=1
 #SBATCH --error=/home/cvoter/Jobs/%J.err
