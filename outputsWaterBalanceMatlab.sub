@@ -1,0 +1,25 @@
+# outputsWaterBalanceMatlab.sub
+# 2018.04 Carolyn Voter
+#------------------------
+# ***Run-specific arguments***
+# arguments = <Matlab version> <runname>
+#------------------------
+arguments = v90 $(runname)
+universe = vanilla
+executable = /home/cvoter/PFscripts/buildCHTCMatlab/run_outputsWaterBalanceMatlab.sh
+output = outputsWaterBalanceMatlab.out
+error = outputsWaterBalanceMatlab.err
+log = outputsWaterBalanceMatlab.log
+
+request_cpus = 1
+request_memory = 2GB
+request_disk = 4GB
+requirements = ( HasGluster == true )
+
+initialdir = /home/cvoter/PFscripts/DAGfiles/$(runname)
+transfer_input_files = http://proxy.chtc.wisc.edu/SQUID/r2015b.tar.gz,\
+/home/cvoter/PFscripts/buildCHTCMatlab/outputsWaterBalanceMatlab
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+
+queue
