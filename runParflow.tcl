@@ -408,7 +408,6 @@ pfset Solver.PrintCLM					True
 pfset Solver.BinaryOutDir					False
 pfset Solver.WriteCLMBinary					False
 pfset Solver.CLM.Print1dOut					False
-pfset Solver.CLM.SingleFile           			True
 pfset Solver.WriteSiloEvapTrans				False
 pfset Solver.WriteSiloOverlandBCFlux			False
 pfset Solver.WriteSiloVelocities				False
