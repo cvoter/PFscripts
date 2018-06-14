@@ -20,8 +20,8 @@
 #Tar and move to GHOME
 tarAndMove () {
     for tarDir in $@; do
-        tar zcf $tarDir.tar.gz $tarDir
-        mv -f $tarDir.tar.gz $GHOME/
+	    tar zcf $tarDir.tar.gz $tarDir
+		mv -f $tarDir.tar.gz $GHOME/
         rm -rf $tarDir 
     done
 }
