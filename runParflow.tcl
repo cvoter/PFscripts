@@ -372,6 +372,7 @@ pfset Solver.PrintMannings					True
 pfset Solver.PrintOverlandSum				True
 pfset Solver.PrintEvapTransSum				True
 pfset Solver.PrintCLM					True
+pfset Solver.CLM.SingleFile					True
 
 # FALSE Always
 pfset Solver.BinaryOutDir					False

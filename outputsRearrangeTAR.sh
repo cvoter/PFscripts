@@ -68,17 +68,12 @@ done
 # ==============================================================================
 # ------------------------------------------------------------------------------
 # FLUXES WITHOUT A "ZERO" HOUR FILE
-# canopy water (can_out)
+# all clm fluxes (clm_output)
 # evaptranssum (evaptranssum)
-# ground evaporation (qflx_evap_grnd)
-# vegetation evaporation (qflx_evap_veg)
-# snow water equivalent (swe_out)
 # overland flow (overlandsum)
-# transpiration (qflx_tran_veg)
 # ------------------------------------------------------------------------------
 nExpected=$totalHr
-tarFlux can_out evaptranssum qflx_evap_grnd qflx_evap_veg swe_out overlandsum \
-        qflx_tran_veg
+tarFlux clm_output evaptranssum overlandsum
 
 # ------------------------------------------------------------------------------
 # FLUXES WITH A "ZERO" HOUR FILE
