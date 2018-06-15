@@ -79,18 +79,7 @@ printf "Rearranging output files....\n"
 sh $SCRIPTS/outputsRearrangeTAR.sh
 
 # ==============================================================================
-# 5. GENERATE OTHER REQUIRED PFB OUTPUTS
-# ==============================================================================
-printf "\n\n"
-date +"%H:%M:%S %Y-%m-%d"
-printf "Generating other required *.pfb output files....\n"
-for storage in subsurface_storage surface_storage; do
-    export flux=$storage
-    sh $SCRIPTS/outputsCreatePFB.sh
-done
-
-# ==============================================================================
-# 6. DONE
+# 5. DONE
 # ==============================================================================
 printf "\n\n"
 date +"%H:%M:%S %Y-%m-%d"
