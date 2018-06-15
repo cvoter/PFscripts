@@ -97,6 +97,25 @@ tarFlux clm_restart
 nExpected=$nruns
 tarFlux kinsol
 
+# ------------------------------------------------------------------------------
+# SUBSURFACE HYDRAULIC PARAMETERS
+# porosity, perm_z, specific_storage
+# ------------------------------------------------------------------------------
+flux=subsurface
+
+#MOVE FLUX OUTPUT TO NEW DIRECTORY
+cd $HOME/$runname
+mkdir $HOME/$flux
+mv $runname.out.porosity.pfb $HOME/$flux/
+mv $runname.out.perm_z.pfb $HOME/$flux/
+mv $runname.out.specific_storage.pfb $HOME/$flux/
+    
+#TAR AND REMOVE DIRECTORY
+cd $HOME
+tar zcf $flux.tar.gz $flux
+rm -rf $flux
+
+
 # ==============================================================================
 # MOVE NEW TARBALLS TO GLUSTER, DELETE OLD TARBALLS
 # ==============================================================================
