@@ -70,10 +70,6 @@ elseif strcmp(flux,'qflx_evap_all') == 1
         dataT(i,1) = evGS(i) + evLS(i);
     end
     dataC = evGC + evLC;
-    %Delete intermediate step of leaf evaporation
-    delete(strcat(GHOME,'/qflx_evap_leaf.grid.step.mat'));
-    delete(strcat(GHOME,'/qflx_evap_leaf.total.step.mat'));
-    delete(strcat(GHOME,'/qflx_evap_leaf.grid.cum.mat'));
 
 %1.3. DEEP DRAINAGE BELOW 1M
 elseif strcmp(flux,'deep_drainage') == 1

@@ -33,7 +33,7 @@ else
       args="${args} \"${token}\"" 
       shift
   done
- # Unique to MATcreate
+# Unique to MATcalc
   set -- $args
   export runname=`echo $1 | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
   export flux=`echo $2 | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
