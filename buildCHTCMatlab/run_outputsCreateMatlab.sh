@@ -33,7 +33,7 @@ else
       args="${args} \"${token}\"" 
       shift
   done
- # Unique to MATcreate
+# Unique to MATcreate
   set -- $args
   export runname=`echo $1 | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
   export flux=`echo $2 | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
@@ -47,8 +47,7 @@ else
   rm MATin.tar.gz
   eval "\"${exe_dir}/outputsCreateMatlab\""
   # Clean up
-  mv ${flux}.*.mat $GHOME/
+  mv *.mat $GHOME/
   rm -f *.pfb *.mat
 fi
 exit
-

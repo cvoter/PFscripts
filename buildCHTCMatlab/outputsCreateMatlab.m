@@ -46,44 +46,93 @@ savename2=strcat(flux,'.total.step.mat'); %dataT; Total domain flux/dump interva
 savename3=strcat(flux,'.grid.cum.mat'); %dataC; Cumulative individual cell flux/dump interval
 
 %% 1. GET GRIDDED HOURLY FLUXES
+% Get matrices
 for i=1:nFiles
     %Raw data
     filename = files(i).name;
     data{i} = pfbTOmatrix(filename); %L[=]m, T[=]hr
     
     %As needed: squeeze 3D matrix to 2D, convert units
-    if (strcmp(flux,'qflx_evap_grnd') == 1) || (strcmp(flux,'qflx_evap_veg') == 1) ||...
-            (strcmp(flux,'qflx_tran_veg') == 1) %CLM flux
-        data{i} = squeeze(data{i}(:,:,1))*dx*dy*3600/1000; %convert mm/s to m^3/hr
-    elseif (strcmp(flux,'can_out') == 1) || (strcmp(flux,'swe_out') == 1) %CLM depth
-        data{i} = squeeze(data{i}(:,:,1))*dx*dy/1000; %convert mm to m^3
-    elseif (strcmp(flux,'overlandsum') == 1) %surface runoff, m^3/hr
+    if (strcmp(flux,'clm_output') == 1) %CLM fluxes
+        %qflx_evap_grnd, convert mm/s to m^3/hr
+        data01{i} = squeeze(data{i}(:,:,6))*dx*dy*3600/1000;
+        %qflx_evap_veg, convert mm/s to m^3/hr
+        data02{i} = squeeze(data{i}(:,:,8))*dx*dy*3600/1000; 
+        %qflx_tran_veg, convert mm/s to m^3/hr
+        data03{i} = squeeze(data{i}(:,:,9))*dx*dy*3600/1000;
+        %swe_out, convert mm to m^3
+        data04{i} = squeeze(data{i}(:,:,11))*dx*dy/1000;
+        %can_out, convert mm to m^3
+        data05{i} = squeeze(data{i}(:,:,12))*dx*dy/1000;
+    elseif (strcmp(flux,'overlandsum') == 1)
+        %surface runoff, m^3/hr
         data{i} = squeeze(data{i}(:,:,1));
     elseif (strcmp(flux,'evaptranssum') == 1)
-        data{i} = data{i}(:,:,(nz-9):nz); %Values only in top 10 layers (#CLM layers), m^3/hr
+        %Values only in top 10 layers (#CLM layers), m^3/hr
+        data{i} = data{i}(:,:,(nz-9):nz); 
     end
     
 end
-save(savename1,'data','-v7.3');
 
+% Save data
+if (strcmp(flux,'clm_output') == 1) %CLM fluxes
+    clear data;
+    data = data01; save('qflx_evap_grnd.grid.step.mat','data','-v7.3'); clear data;
+    data = data02; save('qflx_evap_veg.grid.step.mat','data','-v7.3'); clear data;
+    data = data03; save('qflx_tran_veg.grid.step.mat','data','-v7.3'); clear data;
+    data = data04; save('swe_out.grid.step.mat','data','-v7.3'); clear data;
+    data = data05; save('can_out.grid.step.mat','data','-v7.3'); clear data;
+else %non-CLM fluxes
+    save(savename1,'data','-v7.3');
+end
 %% 2. GET SUMMED HOURLY FLUXES (domain total)
 if (strcmp(flux,'satur') ~= 1) && (strcmp(flux,'press') ~= 1)
-    for i=1:length(data)
-        dataT(i,1) = sum(sum(sum(data{i})));
+    if (strcmp(flux,'clm_output') == 1) %CLM fluxes
+        for i=1:length(data01)
+            dataT01(i,1) = sum(sum(sum(data01{i})));
+            dataT02(i,1) = sum(sum(sum(data02{i})));
+            dataT03(i,1) = sum(sum(sum(data03{i})));
+            dataT04(i,1) = sum(sum(sum(data04{i})));
+            dataT05(i,1) = sum(sum(sum(data05{i})));
+        end
+        dataT = dataT01; save('qflx_evap_grnd.total.step.mat','dataT','-v7.3'); clear dataT;
+        dataT = dataT02; save('qflx_evap_veg.total.step.mat','dataT','-v7.3'); clear dataT;
+        dataT = dataT03; save('qflx_tran_veg.total.step.mat','dataT','-v7.3'); clear dataT;
+        dataT = dataT04; save('swe_out.total.step.mat','dataT','-v7.3'); clear dataT;
+        dataT = dataT05; save('can_out.total.step.mat','dataT','-v7.3'); clear dataT;
+    else %non-CLM fluxes
+        for i=1:length(data)
+            dataT(i,1) = sum(sum(sum(data{i})));
+        end
+        save(savename2,'dataT','-v7.3');
     end
-    save(savename2,'dataT','-v7.3');
 end
 
 %% 3. GET GRIDDED CUMULATIVE FLUXES
 if (strcmp(flux,'satur') ~= 1) && (strcmp(flux,'press') ~= 1) && ...
         (strcmp(flux,'subsurface_storage') ~= 1) && ...
         (strcmp(flux,'surface_storage') ~= 1)
-    dataSize = size(data{1});
-    dataC = zeros(dataSize);
-    for i=1:length(data)
-        dataC = dataC+data{i};
+    if (strcmp(flux,'clm_output') == 1) %CLM fluxes
+        dataSize = size(data01{1});
+        dataC01 = zeros(dataSize);
+        dataC02 = zeros(dataSize);
+        dataC03 = zeros(dataSize);
+        for i=1:length(data01)
+            dataC01 = dataC01+data01{i};
+            dataC02 = dataC02+data02{i};
+            dataC03 = dataC03+data03{i};
+        end
+        dataC = dataC01; save('qflx_evap_grnd.grid.cum.mat','dataC','-v7.3'); clear dataC;
+        dataC = dataC02; save('qflx_evap_veg.grid.cum.mat','dataC','-v7.3'); clear dataC;
+        dataC = dataC03; save('qflx_tran_veg.grid.cum.mat','dataC','-v7.3'); clear dataC;
+    else %non-CLM fluxes
+        dataSize = size(data{1});
+        dataC = zeros(dataSize);
+        for i=1:length(data)
+            dataC = dataC+data{i};
+        end
+        save(savename3,'dataC','-v7.3');
     end
-    save(savename3,'dataC','-v7.3');
 end
 
 end
