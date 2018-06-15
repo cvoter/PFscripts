@@ -9,29 +9,30 @@ function [ ] = outputsCreateMatlab()
 %Assumes runname, flux, and totalHrs are environment variables.
 
 %Be sure to add these lines to CHTC executable (run_foo.sh)
-%Just before "eval" line:
+%Replace everything below the end of the while loop with:
 % # Unique to MATcreate
-%  set -- $args
-%  export runname=`echo $1 | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
-%  export flux=`echo $2 | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
-%  export totalHr=`echo $3 | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
-%  GHOME=/mnt/gluster/cvoter/ParflowOut/$runname
-%  cp $GHOME/$flux.tar.gz .
-%  tar xzf $flux.tar.gz --strip-components=1
-%  rm $flux.tar.gz
-%  cp $GHOME/MATin.tar.gz .
-%  tar xzf MATin.tar.gz --strip-components=1
-%  rm MATin.tar.gz
-%Just after "eval" line:
-%  # Clean up
-%  mv $flux.*.mat $GHOME/
-%  rm -f *.pfb *.mat
+%   set -- $args
+%   export runname=`echo $1 | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
+%   export flux=`echo $2 | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
+%   export totalHr=`echo $3 | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
+%   GHOME=/mnt/gluster/cvoter/ParflowOut/$runname
+%   cp $GHOME/$flux.tar.gz .
+%   tar xzf $flux.tar.gz --strip-components=1
+%   rm $flux.tar.gz
+%   cp $GHOME/MATin.tar.gz .
+%   tar xzf MATin.tar.gz --strip-components=1
+%   rm MATin.tar.gz
+%   eval "\"${exe_dir}/outputsCreateMatlab\""
+%   # Clean up
+%   mv *.mat $GHOME/
+%   rm -f *.pfb *.mat
+% fi
+% exit
 
 %% 0. ESTABLISH DIRECTORIES AND FILES INVOLVED
 % Environment variables
 runname = getenv('runname');
 flux = getenv('flux');
-totalHr = getenv('totalHr');
 
 %Input pfb files (flux)
 files = dir('*.pfb'); %creates structure with file info for all *.pfb files in current directory
@@ -75,64 +76,67 @@ for i=1:nFiles
 end
 
 % Save data
-if (strcmp(flux,'clm_output') == 1) %CLM fluxes
+if (strcmp(flux,'clm_output') == 1)
+    % CLM fluxes
     clear data;
     data = data01; save('qflx_evap_grnd.grid.step.mat','data','-v7.3'); clear data;
     data = data02; save('qflx_evap_veg.grid.step.mat','data','-v7.3'); clear data;
     data = data03; save('qflx_tran_veg.grid.step.mat','data','-v7.3'); clear data;
     data = data04; save('swe_out.grid.step.mat','data','-v7.3'); clear data;
     data = data05; save('can_out.grid.step.mat','data','-v7.3'); clear data;
-else %non-CLM fluxes
+elseif (strcmp(flux,'subsurface') == 1)
+    % subsurface fluxes
+    perm_z = data{1}; 
+    porosity = data{2};
+    specific_storage = data{3};
+    VGalpha = VGa_soil*ones(size(porosity)); VGalpha(porosity<0.1) = VGa_imperv;
+    VGn = VGn_soil*ones(size(porosity)); VGn(porosity<0.1) = VGn_imperv;
+    VGm = (1-(1/VGn_soil))*ones(size(porosity)); VGm(porosity<0.1) = 1-(1/VGn_imperv);
+    save('perm_z.mat','perm_z','-v7.3');
+    save('porosity.mat','porosity','-v7.3');
+    save('specific_storage.mat','specific_storage','-v7.3');
+    save('VGalpha.mat','VGalpha','-v7.3');
+    save('VGn.mat','VGn','-v7.3');
+    save('VGm.mat','VGm','-v7.3');
+else
+    % overlandsum, evaptranssum, press, satur
     save(savename1,'data','-v7.3');
 end
-%% 2. GET SUMMED HOURLY FLUXES (domain total)
-if (strcmp(flux,'satur') ~= 1) && (strcmp(flux,'press') ~= 1)
-    if (strcmp(flux,'clm_output') == 1) %CLM fluxes
-        for i=1:length(data01)
-            dataT01(i,1) = sum(sum(sum(data01{i})));
-            dataT02(i,1) = sum(sum(sum(data02{i})));
-            dataT03(i,1) = sum(sum(sum(data03{i})));
-            dataT04(i,1) = sum(sum(sum(data04{i})));
-            dataT05(i,1) = sum(sum(sum(data05{i})));
-        end
-        dataT = dataT01; save('qflx_evap_grnd.total.step.mat','dataT','-v7.3'); clear dataT;
-        dataT = dataT02; save('qflx_evap_veg.total.step.mat','dataT','-v7.3'); clear dataT;
-        dataT = dataT03; save('qflx_tran_veg.total.step.mat','dataT','-v7.3'); clear dataT;
-        dataT = dataT04; save('swe_out.total.step.mat','dataT','-v7.3'); clear dataT;
-        dataT = dataT05; save('can_out.total.step.mat','dataT','-v7.3'); clear dataT;
-    else %non-CLM fluxes
-        for i=1:length(data)
-            dataT(i,1) = sum(sum(sum(data{i})));
-        end
-        save(savename2,'dataT','-v7.3');
+%% 2. GET SUMMED HOURLY FLUXES (domain total) AND GRIDDED CUMULATIVE FLUXES
+if (strcmp(flux,'clm_output') == 1) %CLM fluxes
+    dataSize = size(data01{1});
+    dataC01 = zeros(dataSize);
+    dataC02 = zeros(dataSize);
+    dataC03 = zeros(dataSize);
+    for i=1:length(data01)
+        % CLM total fluxes
+        dataT01(i,1) = sum(sum(sum(data01{i})));
+        dataT02(i,1) = sum(sum(sum(data02{i})));
+        dataT03(i,1) = sum(sum(sum(data03{i})));
+        dataT04(i,1) = sum(sum(sum(data04{i})));
+        dataT05(i,1) = sum(sum(sum(data05{i})));
+        % CLM cumulative fluxes
+        dataC01 = dataC01+data01{i};
+        dataC02 = dataC02+data02{i};
+        dataC03 = dataC03+data03{i};
     end
-end
-
-%% 3. GET GRIDDED CUMULATIVE FLUXES
-if (strcmp(flux,'satur') ~= 1) && (strcmp(flux,'press') ~= 1) && ...
-        (strcmp(flux,'subsurface_storage') ~= 1) && ...
-        (strcmp(flux,'surface_storage') ~= 1)
-    if (strcmp(flux,'clm_output') == 1) %CLM fluxes
-        dataSize = size(data01{1});
-        dataC01 = zeros(dataSize);
-        dataC02 = zeros(dataSize);
-        dataC03 = zeros(dataSize);
-        for i=1:length(data01)
-            dataC01 = dataC01+data01{i};
-            dataC02 = dataC02+data02{i};
-            dataC03 = dataC03+data03{i};
-        end
-        dataC = dataC01; save('qflx_evap_grnd.grid.cum.mat','dataC','-v7.3'); clear dataC;
-        dataC = dataC02; save('qflx_evap_veg.grid.cum.mat','dataC','-v7.3'); clear dataC;
-        dataC = dataC03; save('qflx_tran_veg.grid.cum.mat','dataC','-v7.3'); clear dataC;
-    else %non-CLM fluxes
-        dataSize = size(data{1});
-        dataC = zeros(dataSize);
-        for i=1:length(data)
-            dataC = dataC+data{i};
-        end
-        save(savename3,'dataC','-v7.3');
+    dataT = dataT01; save('qflx_evap_grnd.total.step.mat','dataT','-v7.3'); clear dataT;
+    dataT = dataT02; save('qflx_evap_veg.total.step.mat','dataT','-v7.3'); clear dataT;
+    dataT = dataT03; save('qflx_tran_veg.total.step.mat','dataT','-v7.3'); clear dataT;
+    dataT = dataT04; save('swe_out.total.step.mat','dataT','-v7.3'); clear dataT;
+    dataT = dataT05; save('can_out.total.step.mat','dataT','-v7.3'); clear dataT;
+    dataC = dataC01; save('qflx_evap_grnd.grid.cum.mat','dataC','-v7.3'); clear dataC;
+    dataC = dataC02; save('qflx_evap_veg.grid.cum.mat','dataC','-v7.3'); clear dataC;
+    dataC = dataC03; save('qflx_tran_veg.grid.cum.mat','dataC','-v7.3'); clear dataC;
+elseif (strcmp(flux,'overlandsum') == 1) || (strcmp(flux,'evaptranssum') == 1)
+    dataSize = size(data{1});
+    dataC = zeros(dataSize);
+    for i=1:length(data)
+        dataT(i,1) = sum(sum(sum(data{i})));
+        dataC = dataC+data{i};
     end
+    save(savename2,'dataT','-v7.3');
+    save(savename3,'dataC','-v7.3');
 end
 
 end

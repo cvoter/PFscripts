@@ -7,18 +7,19 @@
 #-------------------------------
 # Convert to Matlab
 JOB clm /home/cvoter/PFscripts/outputsCreateMatlab.sub
+JOB sub /home/cvoter/PFscripts/outputsCreateMatlab.sub
 JOB etS /home/cvoter/PFscripts/outputsCreateMatlab.sub
 JOB p /home/cvoter/PFscripts/outputsCreateMatlab.sub
 JOB sat /home/cvoter/PFscripts/outputsCreateMatlab.sub
 JOB sr /home/cvoter/PFscripts/outputsCreateMatlab.sub
-JOB Sss /home/cvoter/PFscripts/outputsCreateMatlab.sub
-JOB Ss /home/cvoter/PFscripts/outputsCreateMatlab.sub
 
 # Calculate from Matlab
 JOB evL /home/cvoter/PFscripts/outputsCalculateMatlab.sub
 JOB ev /home/cvoter/PFscripts/outputsCalculateMatlab.sub
 JOB dd /home/cvoter/PFscripts/outputsCalculateMatlab.sub
 Job re /home/cvoter/PFscripts/outputsCalculateMatlab.sub
+JOB Sss /home/cvoter/PFscripts/outputsCalculateMatlab.sub
+JOB Ss /home/cvoter/PFscripts/outputsCalculateMatlab.sub
 
 # Calculate Water Balance
 JOB wb /home/cvoter/PFscripts/outputsWaterBalanceMatlab.sub
@@ -29,7 +30,7 @@ JOB wb /home/cvoter/PFscripts/outputsWaterBalanceMatlab.sub
 # Before Matlab calculations
 PARENT clm  CHILD evL
 PARENT evL CHILD ev
-PARENT p CHILD dd re
+PARENT p sub CHILD dd re Ss Sss
 PARENT etS clm evL ev sr dd re Sss Ss CHILD wb
 
 #-------------------------------
@@ -37,16 +38,17 @@ PARENT etS clm evL ev sr dd re Sss Ss CHILD wb
 #-------------------------------
 # Convert to Matlab
 VARS clm runname="modelname" flux="clm_output" totalHr="insertHr" mem="16GB" disk="20GB"
+VARS sub runname="modelname" flux="subsurface" totalHr="insertHr" mem="1GB" disk="2GB"
 VARS etS runname="modelname" flux="evaptranssum" totalHr="insertHr" mem="10GB" disk="2GB"
 VARS p runname="modelname" flux="press" totalHr="insertHr" mem="16GB" disk="20GB"
 VARS sat runname="modelname" flux="satur" totalHr="insertHr" mem="16GB" disk="20GB"
 VARS sr runname="modelname" flux="overlandsum" totalHr="insertHr" mem="1GB" disk="2GB"
-VARS Sss runname="modelname" flux="subsurface_storage" totalHr="insertHr" mem="16GB" disk="20GB"
-VARS Ss runname="modelname" flux="surface_storage" totalHr="insertHr" mem="1GB" disk="2GB"
 
 # Calculate from Matlab
 VARS evL runname="modelname" flux="qflx_evap_leaf" totalHr="insertHr" mem="1GB" disk="2GB"
 VARS ev runname="modelname" flux="qflx_evap_all" totalHr="insertHr" mem="1GB" disk="2GB"
 VARS dd runname="modelname" flux="deep_drainage" totalHr="insertHr" mem="16GB" disk="20GB"
 VARS re runname="modelname" flux="recharge" totalHr="insertHr" mem="16GB" disk="20GB"
+VARS Sss runname="modelname" flux="subsurface_storage" totalHr="insertHr" mem="16GB" disk="20GB"
+VARS Ss runname="modelname" flux="surface_storage" totalHr="insertHr" mem="16GB" disk="20GB"
 VARS wb runname="modelname"

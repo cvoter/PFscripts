@@ -9,20 +9,23 @@ function [ ] = outputsCalculateMatlab()
 %environment variables.
 
 %Be sure to add these lines to CHTC executable (run_foo.sh)
-%Just before "eval" line:
-% # Unique to MATcreate
-%  set -- $args
-%  export runname=`echo $1 | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
-%  export flux=`echo $2 | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
-%  export totalHr=`echo $3 | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
-%  export GHOME=/mnt/gluster/cvoter/ParflowOut/$runname
-%  cp $GHOME/MATin.tar.gz .
-%  tar xzf MATin.tar.gz --strip-components=1
-%  rm MATin.tar.gz
-%Just after "eval" line:
-%  # Clean up
-%  mv $flux.*.mat $GHOME/
-%  rm -f *.mat
+%Replace everything below the end of the while loop with:
+% # Unique to MATcalc
+%   set -- $args
+%   export runname=`echo $1 | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
+%   export flux=`echo $2 | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
+%   export totalHr=`echo $3 | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
+%   export GHOME=/mnt/gluster/cvoter/ParflowOut/$runname
+%   cp $GHOME/MATin.tar.gz .
+%   tar xzf MATin.tar.gz --strip-components=1
+%   rm MATin.tar.gz
+%   eval "\"${exe_dir}/outputsCalculateMatlab\""
+%   # Clean up
+%   mv ${flux}.*.mat $GHOME/
+%   rm -f *.mat
+% fi
+% exit
+
 %% 0. ESTABLISH DIRECTORIES AND FILES INVOLVED
 % Environment variables
 runname = getenv('runname');
@@ -74,32 +77,31 @@ elseif strcmp(flux,'qflx_evap_all') == 1
 %1.3. DEEP DRAINAGE BELOW 1M
 elseif strcmp(flux,'deep_drainage') == 1
     load(strcat(GHOME,'/press.grid.step.mat')); p = data; clear data;
+    load(strcat(GHOME,'/perm_z.mat'));
+    load(strcat(GHOME,'/VGalpha.mat'));
+    load(strcat(GHOME,'/VGn.mat'));
+    load(strcat(GHOME,'/VGm.mat'));
     zLow = find(z <(z(nz)+dz/2-1),1,'last'); %index for layer just below 1m depth
     dataC = zeros([ny nx]);
     for t = 1:(length(p)-1)
-        p1 = p{t+1}(:,:,zLow); %[m] Pressure in layer just below 1m depth
-        p2 = p{t+1}(:,:,(zLow-1)); %[m] Pressure in layer 2 below 1m depth
-        z1 = z(zLow); z2 = z(zLow-1); %[m] Elevations at each point
+        pBelow = p{t+1}(:,:,zLow); %[m] Pressure in layer just below 1m depth
+        pAbove = p{t+1}(:,:,(zLow-1)); %[m] Pressure in layer just above 1m depth
+        zBelow = z(zLow); zAbove = z(zLow-1); %[m] Elevations at each point
+        pBelow(pBelow > 0) = 0;
+        pAbove(pAbove > 0) = 0;
         for i = 1:ny
             for j=1:nx
-                if p1(i,j) > 0, p1(i,j)=0;
+                if ((pAbove(i,j)+pBelow(i,j))-(zAbove-zBelow))<0
+                    thisPress=abs(pBelow(i,j));
+                else
+                    thisPress=abs(pAbove(i,j));
                 end
-                if p2(i,j) > 0, p2(i,j)=0;
-                end
-                if NaNimp(i,j,zLow) == 1
-                    Ks = Ks_soil; N = VGn_soil; M = 1-(1/N); A=VGa_soil;
-                else Ks = Ks_imperv; N = VGn_imperv; M = 1-(1/N); A=VGa_imperv;
-                end
-                if ((p2(i,j)+p1(i,j))-(z2-z1))<0
-                    P=abs(p1(i,j));
-                else P=abs(p2(i,j));
-                end
-                Se=((1/(1+(A*P)^N))^M);
-                Kr(i,j)=(Se^(1/2))*((1-(1-Se^(1/M))^M)^2);
-                K(i,j)=Ks*Kr(i,j);
+                Se=((1/(1+(VGalpha(i,j,zLow)*thisPress)^VGn(i,j,zLow)))^VGm(i,j,zLow));
+                Kr(i,j)=(Se^(1/2))*((1-(1-Se^(1/VGm(i,j,zLow)))^VGm(i,j,zLow))^2);
+                K(i,j)=perm_z(i,j,zLow)*Kr(i,j);
             end
         end
-        data{t} = dx*dy*(K + K.*(p1-p2)./(z1-z2)); %[m^3/hr]
+        data{t} = dx*dy*(K + K.*(pBelow-pAbove)./(zBelow-zAbove)); %[m^3/hr]
         dataT(t,1) = sum(sum(data{t}));
         dataC = dataC+data{t};
     end
@@ -107,27 +109,60 @@ elseif strcmp(flux,'deep_drainage') == 1
 %1.4. RECHARGE AT MODEL BASE
 elseif strcmp(flux,'recharge') == 1 
     load(strcat(GHOME,'/press.grid.step.mat')); p = data; clear data;
+    load(strcat(GHOME,'/perm_z.mat'));
+    load(strcat(GHOME,'/VGalpha.mat'));
+    load(strcat(GHOME,'/VGn.mat'));
+    load(strcat(GHOME,'/VGm.mat'));
     dataC = zeros([ny nx]);
     for t = 1:(length(p)-1)
-        p1 = zeros([ny nx]); %[m] Pressure hypothetical layer below base of domain
-        p2 = p{t+1}(:,:,1); %[m] Pressure in last domain layer
-        z1 = -dz/2; z2 = 0; %[m] Relative elevations at each point
+        pBelow = zeros([ny nx]); %[m] Pressure hypothetical layer at base of domain
+        pAbove = p{t+1}(:,:,1); %[m] Pressure in last domain layer
+        zBelow = 0; zAbove = z(1); %[m] Relative elevations at each point
+        pBelow(pBelow > 0) = 0;
+        pAbove(pAbove > 0) = 0;
         for i = 1:ny
             for j=1:nx
-                if p1(i,j) > 0, p1(i,j)=0;
-                end
-                if p2(i,j) > 0, p2(i,j)=0;
-                end
-                Ks = Ks_soil; N = VGn_soil; M = 1-(1/N); A=VGa_soil;
-                P=abs(p2(i,j));
-                Se=((1/(1+(A*P)^N))^M);
-                Kr(i,j)=(Se^(1/2))*((1-(1-Se^(1/M))^M)^2);
-                K(i,j)=Ks*Kr(i,j);
+                thisPress=abs(pAbove(i,j));
+                Se=((1/(1+(VGalpha(i,j,1)*thisPress)^VGn(i,j,1)))^VGm(i,j,1));
+                Kr(i,j)=(Se^(1/2))*((1-(1-Se^(1/VGm(i,j,1)))^VGm(i,j,1))^2);
+                K(i,j)=perm_z(i,j,1)*Kr(i,j);
             end
         end
-        data{t} = dx*dy*(K + K.*(p1-p2)./(z1-z2)); %[m^3/hr]
+        data{t} = dx*dy*(K + K.*(pBelow-pAbove)./(zBelow-zAbove)); %[m^3/hr]
         dataT(t,1) = sum(sum(data{t}));
         dataC = dataC+data{t};
+    end
+%1.5. SUBSURFACE STORAGE
+% Assumes zL = 0
+elseif strcmp(flux,'subsurface_storage') == 1
+    load(strcat(GHOME,'/satur.grid.step.mat')); sat = data; clear data;
+    load(strcat(GHOME,'/press.grid.step.mat')); p = data; clear data;
+    load(strcat(GHOME,'/porosity.mat'));
+    load(strcat(GHOME,'/specific_storage.mat'));
+    clear dz;  % remove dz value stored in domainInfo
+    dz(1) = 2*(z(1) - 0);  % assume zL = 0
+    for k = 2:length(z)
+        dz(k) = 2*(z(k) - (z(k-1)+dz(k-1)/2));
+    end
+    for t = 1:length(sat)
+        thisSat = sat{t};
+        thisPress = p{t};
+        for k = 1:length(z)
+            thisSubStorage(:,:,k) = thisSat(:,:,k)*dx*dy*dz(k).*(specific_storage(:,:,k).*thisPress(:,:,k) + porosity(:,:,k));
+        end
+        data{t} = thisSubStorage;
+        dataT(t,1) = sum(sum(sum(data{t})));
+    end
+    
+%1.6. SURFACE STORAGE
+elseif strcmp(flux,'surface_storage') == 1
+    load(strcat(GHOME,'/press.grid.step.mat')); p = data; clear data;
+    for t = 1:length(p)
+        thisPress = p{t};
+        surfacePress = thisPress(:,:,end);
+        surfacePress(surfacePress < 0) = 0;
+        data{t} = surfacePress*dx*dy;
+        dataT(t,1) = sum(sum(data{t}));
     end
 end
 
