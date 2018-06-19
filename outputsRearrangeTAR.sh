@@ -127,3 +127,5 @@ done
 for tarball in "$GHOME/PFout.*.tar.gz"; do
   rm $tarball
 done
+
+rm $GHOME/SAin.tar.gz
