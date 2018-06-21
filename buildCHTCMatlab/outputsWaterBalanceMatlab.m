@@ -3,16 +3,27 @@ function [ ] = outputsWaterBalanceMatlab()
 %Carolyn Voter
 %April 2018
 
-%This script evaluates the water balance down to top 1m depth for a
-%given PF run.
+% This script evaluates the water balance for a given PF run.
+
+% Be sure to add these lines to CHTC executable (run_foo.sh)
+% Replace everything below the end of the while loop with:
 %  # Unique to WBcalcs
-%  set -- $args
-%  export runname=`echo $1 | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
-%  GHOME=/mnt/gluster/cvoter/ParflowOut/$runname
-%  cp $GHOME/MATin.tar.gz .
-%  tar xzf MATin.tar.gz --strip-components=1
-%  rm MATin.tar.gz
-%  cp $GHOME/*.total.step.mat .
+%   set -- $args
+%   export runname=`echo $1 | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
+%   GHOME=/mnt/gluster/cvoter/ParflowOut/$runname
+%   cp $GHOME/MATin.tar.gz .
+%   tar xzf MATin.tar.gz --strip-components=1
+%   rm MATin.tar.gz
+%   cp $GHOME/*.total.step.mat .
+%   eval "\"${exe_dir}/outputsWaterBalanceMatlab\""
+%   mv WB*.mat $GHOME/
+%   rm $GHOME/MATin.tar.gz
+%   rm $GHOME/qflx_evap_grnd.*.mat
+%   rm $GHOME/qflx_evap_veg.*.mat
+%   rm $GHOME/qflx_evap_leaf.*.mat
+%   rm -f *.mat
+% fi
+% exit
 
 %% 0. ESTABLISH DIRECTORIES AND FILES INVOLVED
 %Input matlab files (domainInfo, precip)

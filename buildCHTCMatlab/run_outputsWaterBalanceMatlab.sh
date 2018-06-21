@@ -33,7 +33,7 @@ else
       args="${args} \"${token}\"" 
       shift
   done
-  # Unique to WBcalcs
+# Unique to WBcalcs
   set -- $args
   export runname=`echo $1 | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
   GHOME=/mnt/gluster/cvoter/ParflowOut/$runname
@@ -43,6 +43,10 @@ else
   cp $GHOME/*.total.step.mat .
   eval "\"${exe_dir}/outputsWaterBalanceMatlab\""
   mv WB*.mat $GHOME/
+  rm $GHOME/MATin.tar.gz
+  rm $GHOME/qflx_evap_grnd.*.mat
+  rm $GHOME/qflx_evap_veg.*.mat
+  rm $GHOME/qflx_evap_leaf.*.mat
   rm -f *.mat
 fi
 exit
