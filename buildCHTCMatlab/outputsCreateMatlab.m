@@ -3,13 +3,13 @@ function [ ] = outputsCreateMatlab()
 %Carolyn Voter
 %April 2018
 
-%Script that converts PF *.pfb files to Matlab cell arrays using HTC.
-%Assumes this executable is in the same directory as extracted *.pfb files
-%and domainInfo.mat file.
-%Assumes runname, flux, and totalHrs are environment variables.
+% Script that converts PF *.pfb files to Matlab cell arrays using HTC.
+% Assumes this executable is in the same directory as extracted *.pfb files
+% and domainInfo.mat file. Assumes runname, flux, and totalHrs are
+% environment variables.
 
-%Be sure to add these lines to CHTC executable (run_foo.sh)
-%Replace everything below the end of the while loop with:
+% Be sure to add these lines to CHTC executable (run_foo.sh)
+% Replace everything below the end of the while loop with:
 % # Unique to MATcreate
 %   set -- $args
 %   export runname=`echo $1 | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
@@ -85,19 +85,16 @@ if (strcmp(flux,'clm_output') == 1)
     data = data04; save('swe_out.grid.step.mat','data','-v7.3'); clear data;
     data = data05; save('can_out.grid.step.mat','data','-v7.3'); clear data;
 elseif (strcmp(flux,'subsurface') == 1)
-    % subsurface fluxes
-    perm_z = data{1}; 
-    porosity = data{2};
-    specific_storage = data{3};
+    % subsurface parameters
+    dz_mult = data{1};
+    perm_z = data{2}; 
+    porosity = data{3};
+    specific_storage = data{4};
     VGalpha = VGa_soil*ones(size(porosity)); VGalpha(porosity<0.1) = VGa_imperv;
     VGn = VGn_soil*ones(size(porosity)); VGn(porosity<0.1) = VGn_imperv;
     VGm = (1-(1/VGn_soil))*ones(size(porosity)); VGm(porosity<0.1) = 1-(1/VGn_imperv);
-    save('perm_z.mat','perm_z','-v7.3');
-    save('porosity.mat','porosity','-v7.3');
-    save('specific_storage.mat','specific_storage','-v7.3');
-    save('VGalpha.mat','VGalpha','-v7.3');
-    save('VGn.mat','VGn','-v7.3');
-    save('VGm.mat','VGm','-v7.3');
+    save('subsurface_parameters.mat','dz_mult','perm_z','porosity',...
+        'specific_storage','VGalpha','VGn','VGm','-v7.3');
 else
     % overlandsum, evaptranssum, press, satur
     save(savename1,'data','-v7.3');

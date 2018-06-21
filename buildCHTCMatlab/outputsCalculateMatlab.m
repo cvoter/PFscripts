@@ -3,13 +3,13 @@ function [ ] = outputsCalculateMatlab()
 %Carolyn Voter
 %April 2018
 
-%Calculates additional matricies from original pfb to matrix conversions.
-%Assumes all *.mat files are located in GHOME directory, a specified
-%environment variable. Assumes runname, flux, and totalHrs are also
-%environment variables.
+% Calculates additional matricies from original pfb to matrix conversions.
+% Assumes all *.mat files are located in GHOME directory, a specified
+% environment variable. Assumes runname, flux, and totalHrs are also
+% environment variables.
 
-%Be sure to add these lines to CHTC executable (run_foo.sh)
-%Replace everything below the end of the while loop with:
+% Be sure to add these lines to CHTC executable (run_foo.sh)
+% Replace everything below the end of the while loop with:
 % # Unique to MATcalc
 %   set -- $args
 %   export runname=`echo $1 | sed 's/.\(.*\)/\1/' | sed 's/\(.*\)./\1/'`
@@ -77,10 +77,7 @@ elseif strcmp(flux,'qflx_evap_all') == 1
 %1.3. DEEP DRAINAGE BELOW 1M
 elseif strcmp(flux,'deep_drainage') == 1
     load(strcat(GHOME,'/press.grid.step.mat')); p = data; clear data;
-    load(strcat(GHOME,'/perm_z.mat'));
-    load(strcat(GHOME,'/VGalpha.mat'));
-    load(strcat(GHOME,'/VGn.mat'));
-    load(strcat(GHOME,'/VGm.mat'));
+    load(strcat(GHOME,'/subsurface_parameters.mat'));
     zLow = find(z <(z(nz)+dz/2-1),1,'last'); %index for layer just below 1m depth
     dataC = zeros([ny nx]);
     for t = 1:(length(p)-1)
@@ -109,10 +106,7 @@ elseif strcmp(flux,'deep_drainage') == 1
 %1.4. RECHARGE AT MODEL BASE
 elseif strcmp(flux,'recharge') == 1 
     load(strcat(GHOME,'/press.grid.step.mat')); p = data; clear data;
-    load(strcat(GHOME,'/perm_z.mat'));
-    load(strcat(GHOME,'/VGalpha.mat'));
-    load(strcat(GHOME,'/VGn.mat'));
-    load(strcat(GHOME,'/VGm.mat'));
+    load(strcat(GHOME,'/subsurface_parameters.mat'));
     dataC = zeros([ny nx]);
     for t = 1:(length(p)-1)
         pBelow = zeros([ny nx]); %[m] Pressure hypothetical layer at base of domain
@@ -137,18 +131,13 @@ elseif strcmp(flux,'recharge') == 1
 elseif strcmp(flux,'subsurface_storage') == 1
     load(strcat(GHOME,'/satur.grid.step.mat')); sat = data; clear data;
     load(strcat(GHOME,'/press.grid.step.mat')); p = data; clear data;
-    load(strcat(GHOME,'/porosity.mat'));
-    load(strcat(GHOME,'/specific_storage.mat'));
-    clear dz;  % remove dz value stored in domainInfo
-    dz(1) = 2*(z(1) - 0);  % assume zL = 0
-    for k = 2:length(z)
-        dz(k) = 2*(z(k) - (z(k-1)+dz(k-1)/2));
-    end
+    load(strcat(GHOME,'/subsurface_parameters.mat'));
+    dz = dz*dz_mult;
     for t = 1:length(sat)
         thisSat = sat{t};
         thisPress = p{t};
         for k = 1:length(z)
-            thisSubStorage(:,:,k) = thisSat(:,:,k)*dx*dy*dz(k).*(specific_storage(:,:,k).*thisPress(:,:,k) + porosity(:,:,k));
+            thisSubStorage(:,:,k) = thisSat(:,:,k).*dx.*dy.*dz(:,:,k).*(specific_storage(:,:,k).*thisPress(:,:,k) + porosity(:,:,k));
         end
         data{t} = thisSubStorage;
         dataT(t,1) = sum(sum(sum(data{t})));
