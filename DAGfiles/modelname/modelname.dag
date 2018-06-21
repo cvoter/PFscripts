@@ -30,7 +30,9 @@ JOB wb /home/cvoter/PFscripts/outputsWaterBalanceMatlab.sub
 # Before Matlab calculations
 PARENT clm  CHILD evL
 PARENT evL CHILD ev
-PARENT p sub CHILD dd re Ss Sss
+PARENT p CHILD Ss
+PARENT p sub CHILD dd re
+PARENT p sub sat CHILD Sss
 PARENT etS clm evL ev sr dd re Sss Ss CHILD wb
 
 #-------------------------------
