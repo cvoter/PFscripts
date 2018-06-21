@@ -41,13 +41,13 @@ cp $ICpressure gp.rst."$prettyStart".* $HOME/PFrestart/
 
 #Other required inputs
 mv drv_clmin_start.dat drv_clmin_restart.dat drv_vegm.dat drv_vegp.dat \
-nldas.1hr.clm.txt slopex.pfb slopey.pfb subsurfaceFeature.pfb \
+nldas.1hr.clm.txt slopex.pfb slopey.pfb subsurfaceFeature.pfb dz_mult.pfb \
 runParflow.tcl $HOME/PFrestart/
 
 #Output that doesn't change with loop, only needs to be saved at very end
 mv $runname.out.mannings.pfb $runname.out.mask.pfb $runname.out.perm_x.pfb \
 $runname.out.perm_y.pfb $runname.out.perm_z.pfb $runname.out.porosity.pfb \
-$runname.out.slope_x.pfb $runname.out.slope_y.pfb \
+$runname.out.slope_x.pfb $runname.out.slope_y.pfb $runname.out.dz_mult.pfb \
 $runname.out.specific_storage.pfb $HOME/PFrestart/
 
 # ==============================================================================

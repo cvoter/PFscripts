@@ -53,9 +53,6 @@ for logType in $@; do
         #CLM starting date
         sed -n '/CLM Start Time/{p;q;}' $runname.out.txt | sed -r 's/^.{1}//' >> $runname.info.txt
 		
-        #CHTC processor address
-        head -$np $runname.out.txt >> $runname.info.txt
-		
         #Ending time info
         printf "\n" >> $runname.info.txt
         date +"%H:%M:%S %Y-%m-%d" >> $runname.info.txt
