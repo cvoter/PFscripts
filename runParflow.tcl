@@ -122,6 +122,15 @@ pfset Geom.domain.Patches 					"left right front back bottom top"
 pfset Domain.GeomName					domain
 
 #------------------------------------------------------------------------------------------
+# Geometry: Variable DZ (2016 Manual 6.1.14)
+#------------------------------------------------------------------------------------------
+pfset Solver.Nonlinear.VariableDz	True 
+pfset dzScale.GeomNames domain
+pfset dzScale.Type PFBFile
+pfset Geom.domain.dzScale.FileName dz_mult.pfb
+pfdist dz_mult.pfb
+
+#------------------------------------------------------------------------------------------
 # Basics: Water and Gravity (6.1.8 and 6.1.9)
 # by setting these to unity, pressure is in terms of pressure head [L]
 # and intrinsic permeability is equivalent to hydraulic conductivity [L/T]
@@ -286,8 +295,8 @@ pfset Patch.back.BCPressure.alltime.Value			0.0
 pfset Patch.bottom.BCPressure.Type				DirEquilRefPatch
 pfset Patch.bottom.BCPressure.Cycle			constant
 pfset Patch.bottom.BCPressure.RefGeom			domain
-pfset Patch.bottom.BCPressure.RefPatch			bottom
-pfset Patch.bottom.BCPressure.alltime.Value		0.0
+pfset Patch.bottom.BCPressure.RefPatch			top
+pfset Patch.bottom.BCPressure.alltime.Value		-10.0
 
 pfset Patch.top.BCPressure.Type				OverlandFlow
 pfset Patch.top.BCPressure.Cycle				constant
@@ -373,6 +382,7 @@ pfset Solver.PrintOverlandSum				True
 pfset Solver.PrintEvapTransSum				True
 pfset Solver.PrintCLM					True
 pfset Solver.CLM.SingleFile					True
+pfset Solver.PrintDZMultiplier				True
 
 # FALSE Always
 pfset Solver.BinaryOutDir					False
