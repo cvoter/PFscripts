@@ -109,6 +109,7 @@ mkdir $HOME/$flux
 mv $runname.out.porosity.pfb $HOME/$flux/
 mv $runname.out.perm_z.pfb $HOME/$flux/
 mv $runname.out.specific_storage.pfb $HOME/$flux/
+mv $runname.out.dz_mult.pfb $HOME/$flux/
     
 #TAR AND REMOVE DIRECTORY
 cd $HOME
@@ -129,3 +130,4 @@ for tarball in "$GHOME/PFout.*.tar.gz"; do
 done
 
 rm $GHOME/SAin.tar.gz
+rm $GHOME/PFin.tar.gz

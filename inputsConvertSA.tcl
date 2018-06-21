@@ -24,3 +24,6 @@ pfsave $slopey -pfb slopey.pfb
 
 set ICpressure [pfload ICpressure.sa]
 pfsave $ICpressure -pfb $runname.out.press.00000.pfb
+
+set dz_mult [pfload dz_mult.sa]
+pfsave $dz_mult -pfb dz_mult.pfb
