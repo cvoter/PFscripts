@@ -1,0 +1,3 @@
+DAGfiles/**/*
+!DAGfiles/modelname/*
+!DAGfiles/setupModelSuite.sh
