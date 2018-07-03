@@ -6,7 +6,7 @@
 #------------------------
 arguments = v90 $(runname) $(flux) $(totalHr) $(mem) $(disk)
 universe = vanilla
-executable = /home/cvoter/PFscripts/buildCHTCMatlab/run_outputsCalculateMatlab.sh
+executable = /home/cvoter/PFscripts/outputs_matlab/run_outputsCalculateMatlab.sh
 output = outputsCalculateMatlab.$(flux).out
 error = outputsCalculateMatlab.$(flux).err
 log = outputsCalculateMatlab.$(flux).log
@@ -18,7 +18,7 @@ requirements = ( HasGluster == true )
 
 initialdir = /home/cvoter/PFscripts/DAGfiles/$(runname)
 transfer_input_files = http://proxy.chtc.wisc.edu/SQUID/r2015b.tar.gz,\
-/home/cvoter/PFscripts/buildCHTCMatlab/outputsCalculateMatlab
+/home/cvoter/PFscripts/outputs_matlab/outputsCalculateMatlab
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
 
