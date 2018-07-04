@@ -22,10 +22,13 @@ tarInput () {
 	
 	    #Move appropriate inputs to directory
 	    if [ "$inputDir" = "SAin" ]; then
+            mkdir $inputDir/NLDAS
+            mv NLDAS/* $inputDir/NLDAS/
+            rmdir NLDAS
             mv *.sa $inputDir/
             cp $SCRIPTS/inputsConvertSA.tcl $inputDir/
         elif [ "$inputDir" = "PFin" ]; then
-            mv drv_clmin_start.dat drv_clmin_restart.dat drv_vegm.dat drv_vegp.dat nldas.1hr.clm.txt parameters.txt $inputDir/
+            mv drv_clmin_start.dat drv_clmin_restart.dat drv_vegm.dat drv_vegp.dat parameters.txt $inputDir/
             cp $SCRIPTS/runParflow.tcl $inputDir/
         else
             mv domainInfo.mat precip.mat $inputDir/
