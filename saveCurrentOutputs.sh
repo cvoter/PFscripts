@@ -39,9 +39,13 @@ mv $runname.info.txt $HOME/PFrestart/
 #Restart files (pressure and CLM)
 cp $ICpressure gp.rst."$prettyStart".* $HOME/PFrestart/
 
+#NLDAS Met forcings directory (if 1D, nldas.1hr.clm.txt should be in here)
+mkdir $HOME/PFrestart/NLDAS
+mv NLDAS/* $HOME/PFrestart/NLDAS/
+
 #Other required inputs
 mv drv_clmin_start.dat drv_clmin_restart.dat drv_vegm.dat drv_vegp.dat \
-nldas.1hr.clm.txt slopex.pfb slopey.pfb subsurfaceFeature.pfb dz_mult.pfb \
+slopex.pfb slopey.pfb subsurfaceFeature.pfb dz_mult.pfb \
 runParflow.tcl $HOME/PFrestart/
 
 #Output that doesn't change with loop, only needs to be saved at very end

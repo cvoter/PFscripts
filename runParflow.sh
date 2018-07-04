@@ -137,6 +137,13 @@ sh $SCRIPTS/logComments.sh initialize
 #Initialize time counters for saving output to gluster
 updateTimeCounters
 
+#Check type of weather inputs
+if ls NLDAS/*.sa 1> /dev/null 2>&1; then
+    export NLDAS3D=1
+else
+    export NLDAS3D=0
+fi
+
 # ==============================================================================
 # 4. LOOP THROUGH RUNS
 # ==============================================================================
@@ -144,6 +151,9 @@ for ((loop=start;loop<=nruns;loop++)); do
     # --------------------------------------------------------------------------
     # A. SET UP THIS LOOP
     # --------------------------------------------------------------------------
+    echo "LOOP IS BELOW"
+    echo $loop
+    echo "LOOP IS ABOVE"
     #Stop time
     if [[ $loop -eq $nruns ]]; then
         export pfStopTime=$((totalHr-pfStartCount))
@@ -181,7 +191,7 @@ for ((loop=start;loop<=nruns;loop++)); do
     sh $SCRIPTS/logComments.sh loopEnd
 
     #Delete extra files no longer needed
-    find . -name "*pfb.dist*" -delete
+    find . -maxdepth 1 -name "*pfb.dist*" -delete
     for ((i=startDelete;i<pfStartCount;i++)); do
         num=$(printf "%05d" $i)
         rm gp.rst."$num".*
