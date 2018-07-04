@@ -28,6 +28,7 @@ set runname		$env(runname)
 set pfStartCount	$env(pfStartCount)
 set pfStopTime	$env(pfStopTime)
 set ICpressure	$env(ICpressure)
+set NLDAS3D		$env(NLDAS3D)
 
 set xL $env(xL)
 set yL $env(yL)
@@ -341,7 +342,12 @@ pfset Solver.CLM.ReuseCount					1
 pfset Solver.CLM.DailyRST					False
 pfset Solver.CLM.MetForcing					1D
 pfset Solver.CLM.MetFileName				nldas.1hr.clm.txt
-pfset Solver.CLM.MetFilePath				"$HOME"
+if {$NLDAS3D== 1} {
+    pfset Solver.CLM.MetForcing				3D
+    pfset Solver.CLM.MetFileName				"NLDAS"
+    pfset Solver.CLM.MetFileNT				12
+}
+pfset Solver.CLM.MetFilePath				"$HOME/NLDAS"
 pfset Solver.CLM.CLMFileDir					"$HOME"
 pfset Solver.CLM.IstepStart					$CLMstart
 pfset Solver.CLM.CLMDumpInterval				1
