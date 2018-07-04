@@ -130,4 +130,3 @@ for tarball in "$GHOME/PFout.*.tar.gz"; do
 done
 
 rm $GHOME/SAin.tar.gz
-rm $GHOME/PFin.tar.gz
