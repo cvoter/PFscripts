@@ -7,11 +7,11 @@
 # ==============================================================================
 # SET PARAMETERS
 # ==============================================================================
-P=4
-Q=5
 np=20
-nHr=12
-modelsuite=LotVacantDZ
+nHr=8760
+ndrun=12
+nruns=$(((nHr+ndrun-1)/ndrun))
+modelsuite=Cities
 
 splicefile=/home/cvoter/PFscripts/DAGfiles/modelsplice/$modelsuite.dag
 # ==============================================================================
@@ -26,8 +26,8 @@ createModelDir () {
     cd $runname
     sed "s/modelname/$runname/g" modelname.dag > tmpfile; mv tmpfile modelname.dag
     sed "s/insertHr/$nHr/g" modelname.dag > tmpfile; mv tmpfile modelname.dag
-    sed "s/sP/$P/g" modelname.dag > tmpfile; mv tmpfile modelname.dag
-    sed "s/sQ/$Q/g" modelname.dag > tmpfile; mv tmpfile modelname.dag
+    sed "s/insertdrun/$ndrun/g" modelname.dag > tmpfile; mv tmpfile modelname.dag
+    sed "s/insertnruns/$nruns/g" modelname.dag > tmpfile; mv tmpfile modelname.dag
     sed "s/snp/$np/g" modelname.dag > tmpfile; mv tmpfile $runname.dag
 
     #Remove modelname
@@ -37,16 +37,17 @@ createModelDir () {
 # ==============================================================================
 # LOOP OVER MODELS
 # ==============================================================================
-#for ((L=2;L<=2;L++)); do
-#for Y in ConstDZ VarDZ; do
+for ((location=1;location<=51;location++)); do
+  for type in baseline low_impact; do
     #Define runname and dagname
-    runname=Lot1111_SiL_2012
-    dagname=DLID
-    #runname=$(printf "LotVacant_%s" $Y)
-    #dagname=$(printf "D%s" $Y)
+    #runname=LotVacant_dry
+    #dagname=DLID
+    runname=$(printf "loc%02d_%s" $location $type)
+    dagname=$(printf "D%02d_%s" $location $type)
     echo $runname
 
     #Create dag and add to spliced dag file
     createModelDir
     printf "SPLICE %s /home/cvoter/PFscripts/DAGfiles/%s/%s.dag\n" $dagname $runname $runname >> $splicefile
-#done
+  done
+done
