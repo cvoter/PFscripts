@@ -1,0 +1,24 @@
+# outputsRearrangeTAR.sub
+# 2018.07 Carolyn Voter
+#------------------------
+# ***Run-specific arguments***
+# arguments = <runname> <totalHr> <drun> <nruns> <np>
+#------------------------
+arguments = $(runname) $(totalHr) $(drun) $(nruns) $(np)
+universe = vanilla
+executable = /home/cvoter/PFscripts/HTCoutputsRearrangeTAR.sh
+output = outputsRearrangeTAR.out
+error = outputsRearrangeTAR.err
+log = outputsRearrangeTAR.log
+
+request_cpus = 1
+request_memory = 4GB
+request_disk = 100GB
+requirements = ( HasGluster == true )
+
+initialdir = /home/cvoter/PFscripts/DAGfiles/$(runname)
+transfer_input_files = /home/cvoter/PFscripts/outputsRearrangeTAR.sh
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+
+queue

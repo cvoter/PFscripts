@@ -46,4 +46,4 @@ tarInput () {
 # ==============================================================================
 cd $GHOME
 tarInput SAin PFin MATin
-rm *.fig
+rm -f *.fig

@@ -1,0 +1,24 @@
+# inputsConvertSA.sub
+# 2018.07 Carolyn Voter
+#------------------------
+# ***Run-specific arguments***
+# arguments = <runname> <nruns>
+#------------------------
+arguments = $(runname) $(nruns)
+universe = vanilla
+executable = /home/cvoter/PFscripts/HTCinputsConvertSA.sh
+output = inputsConvertSA.out
+error = inputsConvertSA.err
+log = inputsConvertSA.log
+
+request_cpus = 1
+request_memory = 2GB
+request_disk = 4GB
+requirements = ( HasGluster == true )
+
+initialdir = /home/cvoter/PFscripts/DAGfiles/$(runname)
+transfer_input_files = /home/cvoter/PFscripts/inputsConvertSA.sh
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+
+queue

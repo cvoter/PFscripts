@@ -1,0 +1,27 @@
+# runParflow.sub
+# 2018.07 Carolyn Voter
+#------------------------
+# ***Run-specific arguments***
+# arguments = <runname> <totalHr> <drun> <nruns> <np> <mem> <disk>
+#------------------------
+arguments = $(runname) $(totalHr) $(drun) $(nruns) $(np) $(mem) $(disk)
+universe = vanilla
+executable = /home/cvoter/PFscripts/HTCrunParflow.sh
+output = runParflow.out
+error = runParflow.err
+log = runParflow.log
+
+request_cpus = $(np)
+request_memory = $(mem)
+request_disk = $(disk)
+requirements = ( HasGluster == true )
++is_resumable = true 
+
+initialdir = /home/cvoter/PFscripts/DAGfiles/$(runname)
+transfer_input_files = /home/cvoter/PFscripts/runParflow.sh,\
+/home/cvoter/PFscripts/saveCurrentOutputs.sh,\
+/home/cvoter/PFscripts/logComments.sh
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+
+queue
