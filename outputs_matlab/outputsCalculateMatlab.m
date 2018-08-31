@@ -78,7 +78,7 @@ elseif strcmp(flux,'qflx_evap_all') == 1
 elseif strcmp(flux,'deep_drainage') == 1
     load(strcat(GHOME,'/press.grid.step.mat')); p = data; clear data;
     load(strcat(GHOME,'/subsurface_parameters.mat'));
-    zLow = find(z <(z(nz)+dz/2-1),1,'last'); %index for layer just below 1m depth
+    zLow = find(z < z(nz)-1,1,'last'); %index for layer just below 1m depth
     dataC = zeros([ny nx]);
     for t = 1:(length(p)-1)
         pBelow = p{t+1}(:,:,zLow); %[m] Pressure in layer just below 1m depth
