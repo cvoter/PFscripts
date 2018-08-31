@@ -151,9 +151,6 @@ for ((loop=start;loop<=nruns;loop++)); do
     # --------------------------------------------------------------------------
     # A. SET UP THIS LOOP
     # --------------------------------------------------------------------------
-    echo "LOOP IS BELOW"
-    echo $loop
-    echo "LOOP IS ABOVE"
     #Stop time
     if [[ $loop -eq $nruns ]]; then
         export pfStopTime=$((totalHr-pfStartCount))
