@@ -11,6 +11,7 @@
 # 2 = totalHr
 # 3 = drun
 # 4 = nruns - total number of modeling loops
+# 5 = np - number of processors used to run parflow model
 # ==============================================================================
 export runname=$1
 export totalHr=$2

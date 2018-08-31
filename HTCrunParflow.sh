@@ -20,6 +20,10 @@ export nruns=$4
 # ==============================================================================
 # SET ENVIRONMENT VARIABLES
 # ==============================================================================
+export CC=gcc
+export CXX=g++
+export FC=gfortran
+export F77=gfortran
 export BASE=/mnt/gluster/cvoter/ParFlow
 export PARFLOW_DIR=$BASE/parflow
 export TCL_PATH=$BASE/tcl-8.6.8

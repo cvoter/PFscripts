@@ -14,7 +14,7 @@ log = runParflow.log
 request_cpus = $(np)
 request_memory = $(mem)
 request_disk = $(disk)
-requirements = ( HasGluster == true )
+requirements = ( HasGluster == true ) && (OpSysMajorVer == 7)
 +is_resumable = true 
 
 initialdir = /home/cvoter/PFscripts/DAGfiles/$(runname)
