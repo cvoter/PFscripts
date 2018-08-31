@@ -60,7 +60,7 @@ cp -r $GHOME/. $HOME/$runname
 cd $HOME/$runname
 for tarball in *.tar.gz; do
   tar xzf $tarball --strip-components=1
-  rm $tarball
+  rm -f $tarball
 done
 
 # ==============================================================================
@@ -126,7 +126,7 @@ for tarball in *.tar.gz; do
 done
 
 for tarball in "$GHOME/PFout.*.tar.gz"; do
-  rm $tarball
+  rm -f $tarball
 done
 
 rm $GHOME/SAin.tar.gz
