@@ -58,8 +58,13 @@ cd $HOME/$runname
 #Find and move correct input tarball to local machine
 if [ ! -f $GHOME/PFrestart.tar.gz ]; then
     inputTAR=PFin
+    numGlusterSave=0
 else
     inputTAR=PFrestart
+    cd $GHOME
+    lastOut=$(find . -maxdepth 1 -name "PFout.*.tar.gz" | sort -n | tail -1 | sed -r 's/^.{2}//')
+    numGlusterSave=$(echo $lastOut| tail -c 10 | sed 's/.\{7\}$//' | sed 's/^0*//')
+    cd $HOME/$runname
 fi
 copyUntarHere $inputTAR
 
