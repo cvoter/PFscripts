@@ -24,6 +24,7 @@ JOB sat /home/cvoter/PFscripts/outputsCreateMatlab.sub
 JOB sr /home/cvoter/PFscripts/outputsCreateMatlab.sub
 
 # Calculate from Matlab
+JOB etS2 /home/cvoter/PFscripts/outputsCalculateMatlab.sub
 JOB evL /home/cvoter/PFscripts/outputsCalculateMatlab.sub
 JOB ev /home/cvoter/PFscripts/outputsCalculateMatlab.sub
 JOB dd /home/cvoter/PFscripts/outputsCalculateMatlab.sub
@@ -43,12 +44,13 @@ PARENT run CHILD retar
 PARENT retar CHILD clm sub etS p sat sr
 
 # Before Matlab calculations
+PARENT etS sub CHILD etS2
 PARENT clm  CHILD evL
 PARENT evL CHILD ev
 PARENT p CHILD Ss
 PARENT p sub CHILD dd re
 PARENT p sub sat CHILD Sss
-PARENT etS clm evL ev sr dd re Sss Ss CHILD wb
+PARENT etS2 clm evL ev sr dd re Sss Ss CHILD wb
 
 #-------------------------------
 # Variable inputs
@@ -67,15 +69,16 @@ VARS retar runname="modelname" totalHr="insertHr" drun="insertdrun" nruns="inser
 VARS clm runname="modelname" flux="clm_output" totalHr="insertHr" mem="16GB" disk="20GB"
 VARS sub runname="modelname" flux="subsurface" totalHr="insertHr" mem="1GB" disk="3GB"
 VARS etS runname="modelname" flux="evaptranssum" totalHr="insertHr" mem="10GB" disk="3GB"
-VARS p runname="modelname" flux="press" totalHr="insertHr" mem="16GB" disk="20GB"
-VARS sat runname="modelname" flux="satur" totalHr="insertHr" mem="16GB" disk="20GB"
+VARS p runname="modelname" flux="press" totalHr="insertHr" mem="32GB" disk="20GB"
+VARS sat runname="modelname" flux="satur" totalHr="insertHr" mem="32GB" disk="20GB"
 VARS sr runname="modelname" flux="overlandsum" totalHr="insertHr" mem="1GB" disk="3GB"
 
 # Calculate from Matlab
+VARS etS2 runname="modelname" flux="evaptranssum" totalHr="insertHr" mem="10GB" disk="3GB"
 VARS evL runname="modelname" flux="qflx_evap_leaf" totalHr="insertHr" mem="1GB" disk="3GB"
 VARS ev runname="modelname" flux="qflx_evap_all" totalHr="insertHr" mem="1GB" disk="3GB"
 VARS dd runname="modelname" flux="deep_drainage" totalHr="insertHr" mem="16GB" disk="20GB"
 VARS re runname="modelname" flux="recharge" totalHr="insertHr" mem="16GB" disk="20GB"
-VARS Sss runname="modelname" flux="subsurface_storage" totalHr="insertHr" mem="16GB" disk="20GB"
+VARS Sss runname="modelname" flux="subsurface_storage" totalHr="insertHr" mem="32GB" disk="20GB"
 VARS Ss runname="modelname" flux="surface_storage" totalHr="insertHr" mem="16GB" disk="20GB"
 VARS wb runname="modelname"
