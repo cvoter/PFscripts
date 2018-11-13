@@ -153,6 +153,20 @@ elseif strcmp(flux,'surface_storage') == 1
         data{t} = surfacePress*dx*dy;
         dataT(t,1) = sum(sum(data{t}));
     end
+
+%1.7. EVAPTRANSSUM
+elseif strcmp(flux,'evaptranssum') == 1
+    load(strcat(GHOME,'/evaptranssum.grid.step.mat')); evaptranssum_old = data; clear data;
+    load(strcat(GHOME,'/subsurface_parameters.mat'));
+    nz_clm = length(evaptranssum_old{1}(1,1,:));
+    dz_mult_clm = dz_mult(:,:,(nz-nz_clm+1):nz);
+    dataSize = size(evaptranssum_old{1});
+    dataC = zeros(dataSize);
+    for t = 1:length(evaptranssum_old)
+        data{t} = evaptranssum_old{t}.*dz_mult_clm;
+        dataT(t,1) = sum(sum(sum(data{t})));
+        dataC = dataC+data{t};
+    end
 end
 
 %% 2. SAVE NEW FLUX
