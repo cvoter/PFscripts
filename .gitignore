@@ -1,3 +1,4 @@
 DAGfiles/**/*
 !DAGfiles/modelname/*
 !DAGfiles/setupModelSuite.sh
+!DAGfiles/current_model_status.sh
