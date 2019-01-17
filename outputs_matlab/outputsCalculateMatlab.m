@@ -78,7 +78,7 @@ elseif strcmp(flux,'qflx_evap_all') == 1
 elseif strcmp(flux,'deep_drainage') == 1
     load(strcat(GHOME,'/press.grid.step.mat')); p = data; clear data;
     load(strcat(GHOME,'/subsurface_parameters.mat'));
-    zLow = find(z <(z(nz)+dz/2-1),1,'last'); %index for layer just below 1m depth
+    zLow = find(z < z(nz)-1,1,'last'); %index for layer just below 1m depth
     dataC = zeros([ny nx]);
     for t = 1:(length(p)-1)
         pBelow = p{t+1}(:,:,zLow); %[m] Pressure in layer just below 1m depth
@@ -152,6 +152,20 @@ elseif strcmp(flux,'surface_storage') == 1
         surfacePress(surfacePress < 0) = 0;
         data{t} = surfacePress*dx*dy;
         dataT(t,1) = sum(sum(data{t}));
+    end
+
+%1.7. EVAPTRANSSUM
+elseif strcmp(flux,'evaptranssum') == 1
+    load(strcat(GHOME,'/evaptranssum.grid.step.mat')); evaptranssum_old = data; clear data;
+    load(strcat(GHOME,'/subsurface_parameters.mat'));
+    nz_clm = length(evaptranssum_old{1}(1,1,:));
+    dz_mult_clm = dz_mult(:,:,(nz-nz_clm+1):nz);
+    dataSize = size(evaptranssum_old{1});
+    dataC = zeros(dataSize);
+    for t = 1:length(evaptranssum_old)
+        data{t} = evaptranssum_old{t}.*dz_mult_clm;
+        dataT(t,1) = sum(sum(sum(data{t})));
+        dataC = dataC+data{t};
     end
 end
 
