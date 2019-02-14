@@ -116,6 +116,14 @@ export porosity_imperv=${27}
 export Ssat_imperv=${28}
 export Sres_imperv=${29}
 
+#Amended soil subsurface parameters
+export Ks_amend=${30}
+export VGa_amend=${31}
+export VGn_amend=${32}
+export porosity_amend=${33}
+export Ssat_amend=${34}
+export Sres_amend=${35}
+
 # ==============================================================================
 # 3. FIGURE OUT WHERE MODEL LEFT OFF AND TAKE NOTES
 # ==============================================================================
