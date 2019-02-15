@@ -67,12 +67,12 @@ set porosity_imperv $env(porosity_imperv)
 set Ssat_imperv $env(Ssat_imperv)
 set Sres_imperv $env(Sres_imperv)
 
-set Ks_amend$env(Ks_amend)
-set VGa_amend$env(VGa_amend)
-set VGn_amend$env(VGn_amend)
-set porosity_amend$env(porosity_amend)
-set Ssat_amend$env(Ssat_amend)
-set Sres_amend$env(Sres_amend)
+set Ks_amend $env(Ks_amend)
+set VGa_amend $env(VGa_amend)
+set VGn_amend $env(VGn_amend)
+set porosity_amend $env(porosity_amend)
+set Ssat_amend $env(Ssat_amend)
+set Sres_amend $env(Sres_amend)
 
 #------------------------------------------------------------------------------------------
 # Processor topology (6.1.2)
