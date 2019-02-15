@@ -8,10 +8,10 @@
 # SET PARAMETERS
 # ==============================================================================
 np=20
-nHr=8760
+nHr=5160
 ndrun=12
 nruns=$(((nHr+ndrun-1)/ndrun))
-modelsuite=Cities
+modelsuite=soil_pixels_01
 
 splicefile=/home/cvoter/PFscripts/DAGfiles/modelsplice/$modelsuite.dag
 # ==============================================================================
@@ -37,17 +37,15 @@ createModelDir () {
 # ==============================================================================
 # LOOP OVER MODELS
 # ==============================================================================
-for ((location=1;location<=51;location++)); do
-  for type in baseline low_impact; do
+for percent in 0 0.25 0.5 1 2.5 5 10 25 50 100; do
     #Define runname and dagname
     #runname=LotVacant_dry
     #dagname=DLID
-    runname=$(printf "loc%02d_%s" $location $type)
-    dagname=$(printf "D%02d_%s" $location $type)
+    runname=$(printf "amend_pixels_%s" $percent)
+    dagname=$(printf "D%s" $percent)
     echo $runname
 
     #Create dag and add to spliced dag file
     createModelDir
     printf "SPLICE %s /home/cvoter/PFscripts/DAGfiles/%s/%s.dag\n" $dagname $runname $runname >> $splicefile
-  done
 done
