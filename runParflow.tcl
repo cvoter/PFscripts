@@ -67,6 +67,13 @@ set porosity_imperv $env(porosity_imperv)
 set Ssat_imperv $env(Ssat_imperv)
 set Sres_imperv $env(Sres_imperv)
 
+set Ks_amend $env(Ks_amend)
+set VGa_amend $env(VGa_amend)
+set VGn_amend $env(VGn_amend)
+set porosity_amend $env(porosity_amend)
+set Ssat_amend $env(Ssat_amend)
+set Sres_amend $env(Sres_amend)
+
 #------------------------------------------------------------------------------------------
 # Processor topology (6.1.2)
 #------------------------------------------------------------------------------------------
@@ -98,10 +105,11 @@ pfset GeomInput.domain_input.InputType			Box
 pfset GeomInput.domain_input.GeomName			domain
 
 pfset GeomInput.indicator_input.InputType			IndicatorField
-pfset GeomInput.indicator_input.GeomNames			"pervious impervious"
+pfset GeomInput.indicator_input.GeomNames			"pervious impervious amended"
 pfset Geom.indicator_input.FileName			"subsurfaceFeature.pfb"
 pfset GeomInput.pervious.Value				1
 pfset GeomInput.impervious.Value				2
+pfset GeomInput.amended.Value				3
 
 pfdist subsurfaceFeature.pfb
 #------------------------------------------------------------------------------------------
@@ -125,10 +133,10 @@ pfset Domain.GeomName					domain
 #------------------------------------------------------------------------------------------
 # Geometry: Variable DZ (2016 Manual 6.1.14)
 #------------------------------------------------------------------------------------------
-pfset Solver.Nonlinear.VariableDz	True 
-pfset dzScale.GeomNames domain
-pfset dzScale.Type PFBFile
-pfset Geom.domain.dzScale.FileName dz_mult.pfb
+pfset Solver.Nonlinear.VariableDz				True 
+pfset dzScale.GeomNames 					domain
+pfset dzScale.Type 						PFBFile
+pfset Geom.domain.dzScale.FileName 			dz_mult.pfb
 pfdist dz_mult.pfb
 
 #------------------------------------------------------------------------------------------
@@ -157,13 +165,16 @@ pfset Geom.domain.SpecificStorage.Value			1.0e-4
 #------------------------------------------------------------------------------------------
 # Geology: Permeability (6.1.11)
 #------------------------------------------------------------------------------------------
-pfset Geom.Perm.Names					"pervious impervious"
+pfset Geom.Perm.Names					"pervious impervious amended"
 
 pfset Geom.pervious.Perm.Type				Constant
 pfset Geom.pervious.Perm.Value				$Ks_soil
 
 pfset Geom.impervious.Perm.Type				Constant
 pfset Geom.impervious.Perm.Value				$Ks_imperv
+
+pfset Geom.amended.Perm.Type				Constant
+pfset Geom.amended.Perm.Value				$Ks_amend
 
 pfset Perm.TensorType					TensorByGeom
 pfset Geom.Perm.TensorByGeom.Names				"domain"
@@ -174,7 +185,7 @@ pfset Geom.domain.Perm.TensorValZ				1.0
 #------------------------------------------------------------------------------------------
 # Geology: Porosity (6.1.12)
 #------------------------------------------------------------------------------------------
-pfset Geom.Porosity.GeomNames				"pervious impervious"
+pfset Geom.Porosity.GeomNames				"pervious impervious amended"
 
 pfset Geom.pervious.Porosity.Type				Constant
 pfset Geom.pervious.Porosity.Value				$porosity_soil
@@ -182,11 +193,15 @@ pfset Geom.pervious.Porosity.Value				$porosity_soil
 pfset Geom.impervious.Porosity.Type			Constant
 pfset Geom.impervious.Porosity.Value			$porosity_imperv
 
+pfset Geom.amended.Porosity.Type				Constant
+pfset Geom.amended.Porosity.Value				$porosity_amend
+
+
 #------------------------------------------------------------------------------------------
 # Richards: Relative Permeability (6.1.19)
 #------------------------------------------------------------------------------------------
 pfset Phase.RelPerm.Type					VanGenuchten
-pfset Phase.RelPerm.GeomNames				"pervious impervious"
+pfset Phase.RelPerm.GeomNames				"pervious impervious amended"
 
 pfset Geom.pervious.RelPerm.Alpha				$VGa_soil
 pfset Geom.pervious.RelPerm.N				$VGn_soil
@@ -194,11 +209,14 @@ pfset Geom.pervious.RelPerm.N				$VGn_soil
 pfset Geom.impervious.RelPerm.Alpha			$VGa_imperv
 pfset Geom.impervious.RelPerm.N				$VGn_imperv
 
+pfset Geom.amended.RelPerm.Alpha				$VGa_amend
+pfset Geom.amended.RelPerm.N				$VGn_amend
+
 #------------------------------------------------------------------------------------------
 # Richards: Saturation (6.1.22)
 #------------------------------------------------------------------------------------------
 pfset Phase.Saturation.Type					VanGenuchten
-pfset Phase.Saturation.GeomNames				"pervious impervious"
+pfset Phase.Saturation.GeomNames				"pervious impervious amended"
 
 pfset Geom.pervious.Saturation.Alpha			$VGa_soil
 pfset Geom.pervious.Saturation.N				$VGn_soil
@@ -209,6 +227,11 @@ pfset Geom.impervious.Saturation.Alpha			$VGa_imperv
 pfset Geom.impervious.Saturation.N				$VGn_imperv
 pfset Geom.impervious.Saturation.SRes			$Sres_imperv
 pfset Geom.impervious.Saturation.SSat			$Ssat_imperv
+
+pfset Geom.amended.Saturation.Alpha			$VGa_amend
+pfset Geom.amended.Saturation.N				$VGn_amend
+pfset Geom.amended.Saturation.SRes				$Sres_amend
+pfset Geom.amended.Saturation.SSat				$Ssat_amend
 
 #------------------------------------------------------------------------------------------
 # Surface: Topo slopes in x- and y-directions (6.1.16)
@@ -229,11 +252,12 @@ pfset ComputationalGrid.NZ					$nz
 #------------------------------------------------------------------------------------------
 # Surface: Mannings coefficient (6.1.15)
 #------------------------------------------------------------------------------------------
-pfset Mannings.GeomNames					"pervious impervious"
+pfset Mannings.GeomNames					"pervious impervious amended"
 pfset Mannings.Type						Constant
 
 pfset Mannings.Geom.pervious.Value				$mn_grass
 pfset Mannings.Geom.impervious.Value			$mn_imperv
+pfset Mannings.Geom.amended.Value				$mn_grass
 
 #------------------------------------------------------------------------------------------
 # Other: necessary, but unused by me (6.1.8, 6.1.17, and 6.1.30)
