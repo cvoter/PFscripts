@@ -60,7 +60,7 @@ VARS tar runname="modelname"
 VARS sa runname="modelname" nruns="insertnruns"
 
 #Run Parflow
-VARS run runname="modelname" totalHr="insertHr" drun="insertdrun" nruns="insertnruns" np="snp" mem="8GB" disk="20GB"
+VARS run runname="modelname" totalHr="insertHr" drun="insertdrun" nruns="insertnruns" np="snp" mem="8GB" disk="50GB"
 
 #Rearrange Parflow
 VARS retar runname="modelname" totalHr="insertHr" drun="insertdrun" nruns="insertnruns" np="snp"
@@ -68,7 +68,7 @@ VARS retar runname="modelname" totalHr="insertHr" drun="insertdrun" nruns="inser
 # Convert to Matlab
 VARS clm runname="modelname" flux="clm_output" totalHr="insertHr" mem="16GB" disk="20GB"
 VARS sub runname="modelname" flux="subsurface" totalHr="insertHr" mem="1GB" disk="3GB"
-VARS etS runname="modelname" flux="evaptranssum" totalHr="insertHr" mem="10GB" disk="3GB"
+VARS etS runname="modelname" flux="evaptranssum" totalHr="insertHr" mem="10GB" disk="10GB"
 VARS p runname="modelname" flux="press" totalHr="insertHr" mem="32GB" disk="20GB"
 VARS sat runname="modelname" flux="satur" totalHr="insertHr" mem="32GB" disk="20GB"
 VARS sr runname="modelname" flux="overlandsum" totalHr="insertHr" mem="1GB" disk="3GB"
