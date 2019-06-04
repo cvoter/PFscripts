@@ -39,16 +39,24 @@ printf "Runname\tPF Hour\tPF Running Total\tDAG submit\n" > $outputFile
 
 GHOME=/mnt/gluster/cvoter/ParflowOut
 DAGdir=~/PFscripts/DAGfiles/modelsplice
-DAGfile=Cities.dag.nodes.log
-for ((location=1;location<=51;location++)); do
-    for type in baseline low_impact; do
-        runname=$(printf "loc%02d_%s" $location $type)
-        dagname=$(printf "D%02d_%s" $location $type)
-		
-		readInfoFile
-		readDAGFile
-		
-		printf "%s\t%s\t%s\t%s\n" $runname $lastTime $runningTime $lastSubmit >> $outputFile
+DAGfile=soil_pixels_01.dag.nodes.log
 
-	done
+for percent in 0 0.25 0.5 1 2.5 5 10 25 50 100; do
+    runname=$(printf "amend_pixels_%s" $percent)
+    dagname=$(printf "D%s" $percent)
+    echo $runname
+    readInfoFile
+    readDAGFile
+    printf "%s\t%s\t%s\t%s\n" $runname $lastTime $runningTime $lastSubmit >> $outputFile
+done
+
+DAGfile=soil_pixels_02.dag.nodes.log
+count=1
+for runname in amend_feature_ds0_fw0_dw0_sw1 amend_feature_ds0_fw0_dw0_sw2 amend_feature_ds0_fw0_dw0_sw4 amend_feature_ds0_fw0_dw1_sw0 amend_feature_ds0_fw0_dw2_sw0 amend_feature_ds0_fw1_dw0_sw0 amend_feature_ds0_fw2_dw0_sw0 amend_feature_ds1_fw0_dw0_sw0 amend_feature_ds1_fw0_dw0_sw4 amend_feature_ds1_fw1_dw1_sw1 amend_feature_ds3_fw0_dw0_sw0 amend_feature_ds3_fw0_dw0_sw4 amend_feature_ds3_fw1_dw1_sw1; do
+    echo $runname
+    dagname=$(printf "D%02d" $count)
+    readInfoFile
+    readDAGFile
+    printf "%s\t%s\t%s\t%s\n" $runname $lastTime $runningTime $lastSubmit >> $outputFile
+    count=$((count+1))
 done	
