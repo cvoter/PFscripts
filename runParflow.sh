@@ -124,6 +124,18 @@ export porosity_amend=${33}
 export Ssat_amend=${34}
 export Sres_amend=${35}
 
+export Ks_soil_mean=${36}
+export Ks_soil_sigma=${37}
+
+#Impervious surface and subsurface parameters
+export Ks_semiperv=${38}
+export mn_semiperv=${39}
+export VGa_semiperv=${40}
+export VGn_semiperv=${41}
+export porosity_semiperv=${42}
+export Ssat_semiperv=${43}
+export Sres_semiperv=${44}
+
 # ==============================================================================
 # 3. FIGURE OUT WHERE MODEL LEFT OFF AND TAKE NOTES
 # ==============================================================================

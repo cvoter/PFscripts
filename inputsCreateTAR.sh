@@ -26,6 +26,7 @@ tarInput () {
             mv NLDAS/* $inputDir/NLDAS/
             rmdir NLDAS
             mv *.sa $inputDir/
+            mv *.pfb $inputDir/
             cp $SCRIPTS/inputsConvertSA.tcl $inputDir/
         elif [ "$inputDir" = "PFin" ]; then
             mv drv_clmin_start.dat drv_clmin_restart.dat drv_vegm.dat drv_vegp.dat parameters.txt $inputDir/
